@@ -1,9 +1,9 @@
 // manages the tileset
 #include "Tileset.h"
 
-#include "../ResourceManager.h"
-#include "../config.h"
-#include "../nx.h"
+#include "ResourceManager.h"
+#include "config.h"
+#include "nx.h"
 #include "Surface.h"
 #include "Renderer.h"
 
@@ -54,10 +54,10 @@ bool Tileset::load(int new_tileset)
 // draw the given tile from the current tileset to the screen
 void Tileset::drawTile(int x, int y, int t)
 {
-  // 16 tiles per row on all tilesheet
   int srcx = (t % 16) * TILE_W;
   int srcy = (t / 16) * TILE_H;
 
+  // 16 tiles per row on all tilesheet
   Renderer::getInstance()->drawSurface(_tileset, x, y, srcx, srcy, TILE_W, TILE_H);
 }
 

@@ -21,12 +21,10 @@ Message::Message(const std::string &msg, const std::string &msg2)
   MESSAGE_X = ((Renderer::getInstance()->screenWidth / 2) - 112);
   MESSAGE_Y = ((Renderer::getInstance()->screenHeight / 2) - 30);
 
-  rawKeyReturn          = NULL;
-  on_dismiss            = NULL;
-  last_sdl_action.key   = -1;
-  last_sdl_action.jbut  = -1;
-  last_sdl_action.jhat  = -1;
-  last_sdl_action.jaxis = -1;
+  rawKeyReturn               = NULL;
+  on_dismiss                 = NULL;
+  last_input_action.key      = -1;
+  last_input_action.gamepad_button = -1;
 
   fMsg  = msg;
   fMsg2 = msg2;
@@ -85,11 +83,18 @@ void Message::Draw()
 
 void Message::RunInput()
 {
-  if ((last_sdl_action.key != -1) || (last_sdl_action.jbut != -1) || (last_sdl_action.jhat != -1)
-      || (last_sdl_action.jaxis != -1))
+  int key = GetKeyPressed();
+  int btn = -1;
+  if (IsGamepadAvailable(0))
+    btn = GetGamepadButtonPressed();
+
+  if (key > 0 || btn > 0)
   {
+    last_input_action.key = (key > 0) ? key : -1;
+    last_input_action.gamepad_button = (btn > 0) ? btn : -1;
+
     if (rawKeyReturn)
-      *rawKeyReturn = last_sdl_action;
+      *rawKeyReturn = last_input_action;
     if (on_dismiss)
       (*on_dismiss)(this);
     delete this;

@@ -1,18 +1,15 @@
 
 #ifndef _INPUT_H
 #define _INPUT_H
-#include <SDL.h>
+
+#include <cstdint>
 #include <string>
 
-typedef struct
+struct in_action
 {
   int32_t key;
-  int32_t jbut;
-  int32_t jhat;
-  int32_t jhat_value;
-  int32_t jaxis;
-  int32_t jaxis_value;
-} in_action;
+  int32_t gamepad_button;
+};
 
 enum INPUTS
 {
@@ -59,13 +56,12 @@ enum INPUTS
 
 extern bool inputs[INPUT_COUNT];
 extern bool lastinputs[INPUT_COUNT];
-extern in_action last_sdl_action;
-extern SDL_Joystick *joy;
+extern in_action last_input_action;
 extern int ACCEPT_BUTTON;
 extern int DECLINE_BUTTON;
 
 bool input_init(void);
-void input_remap(int keyindex, in_action sdl_key);
+void input_remap(int keyindex, in_action act);
 in_action input_get_mapping(int keyindex);
 const std::string input_get_name(int index);
 void input_set_mappings(in_action *array);
@@ -75,5 +71,7 @@ bool buttondown(void);
 bool buttonjustpushed(void);
 bool justpushed(int k);
 void rumble(float str, uint32_t len);
+
+const char *get_key_name(int key);
 
 #endif

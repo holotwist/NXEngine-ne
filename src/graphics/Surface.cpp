@@ -1,7 +1,7 @@
 #include "Surface.h"
 #include "Renderer.h"
-#include "../Utils/Logger.h"
-#include "zoom.h"
+#include "Logger.h"
+#include <algorithm>
 
 namespace NXE
 {
@@ -9,9 +9,10 @@ namespace Graphics
 {
 
 Surface::Surface()
-    : _texture(nullptr)
-    , _width(0)
-    , _height(0)
+  : _texture{0}
+  , _width(0)
+  , _height(0)
+  , alpha(255)
 {
 }
 
@@ -20,40 +21,49 @@ Surface::~Surface()
   cleanup();
 }
 
-// load the surface from a .pbm or bitmap file
-bool Surface::loadImage(const std::string &pbm_name, bool use_colorkey)
+bool Surface::loadImage(const std::string &filename, bool use_colorkey)
 {
   cleanup();
 
-  SDL_Surface *image = SDL_LoadBMP(pbm_name.c_str());
-  if (!image)
+  int dataSize = 0;
+  unsigned char *fileData = LoadFileData(filename.c_str(), &dataSize);
+  if (!fileData)
   {
-    LOG_ERROR("Surface::LoadImage: load failed of '{}'! {}", pbm_name, SDL_GetError());
+    LOG_ERROR("Surface::loadImage: failed to read file '{}'", filename);
     return false;
   }
 
-  _width = image->w * Renderer::getInstance()->scale;
-  _height = image->h * Renderer::getInstance()->scale;
+  // Cave Story .pbm files are standard BMP files
+  const char *fileType = ".bmp";
+  std::string lower = filename;
+  std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+  if (lower.rfind(".png") != std::string::npos)
+    fileType = ".png";
 
-  SDL_Surface *image_scaled = SDL_ZoomSurface(image, Renderer::getInstance()->scale);
-  SDL_FreeSurface(image);
+  Image image = LoadImageFromMemory(fileType, fileData, dataSize);
+  UnloadFileData(fileData);
 
+  if (image.data == nullptr)
+  {
+    LOG_ERROR("Surface::loadImage: failed to decode image '{}'", filename);
+    return false;
+  }
+
+  _width = image.width;
+  _height = image.height;
+
+  // Replace black (colorkey) with transparency
   if (use_colorkey)
   {
-    SDL_SetColorKey(image_scaled, SDL_TRUE, SDL_MapRGB(image_scaled->format, 0, 0, 0));
+    ImageFormat(&image, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+    ImageColorReplace(&image, Color{0, 0, 0, 255}, Color{0, 0, 0, 0});
   }
 
-  _texture = SDL_CreateTextureFromSurface(Renderer::getInstance()->renderer(), image_scaled);
+  _texture = LoadTextureFromImage(image);
+  SetTextureFilter(_texture, TEXTURE_FILTER_POINT);
 
-  SDL_FreeSurface(image_scaled);
-
-  if (!_texture)
-  {
-    LOG_ERROR("Surface::LoadImage: SDL_CreateTextureFromSurface failed: {}", SDL_GetError());
-    return false;
-  }
-
-  return true;
+  UnloadImage(image);
+  return (_texture.id != 0);
 }
 
 Surface *Surface::fromFile(const std::string &pbm_name, bool use_colorkey)
@@ -64,33 +74,34 @@ Surface *Surface::fromFile(const std::string &pbm_name, bool use_colorkey)
     delete sfc;
     return nullptr;
   }
-
   return sfc;
 }
 
-int Surface::width()
+int Surface::width() const
 {
-  return _width / Renderer::getInstance()->scale;
+  return _width;
 }
 
-int Surface::height()
+int Surface::height() const
 {
-  return _height / Renderer::getInstance()->scale;
+  return _height;
 }
 
-SDL_Texture* Surface::texture()
+const Texture2D &Surface::texture() const
 {
   return _texture;
 }
 
 void Surface::cleanup()
 {
-  if (_texture)
+  if (_texture.id != 0)
   {
-    SDL_DestroyTexture(_texture);
-    _texture = nullptr;
+    UnloadTexture(_texture);
+    _texture = Texture2D{0};
   }
+  _width = 0;
+  _height = 0;
 }
 
-}; // namespace Graphics
-}; // namespace NXE
+} // namespace Graphics
+} // namespace NXE

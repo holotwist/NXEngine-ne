@@ -23,7 +23,7 @@ using namespace NXE::Graphics;
 #include <cstdarg>
 #include <string>
 #include <vector>
-#include <SDL.h>
+#include <cstring>
 
 #include "sound/SoundManager.h"
 #include "player.h"
@@ -690,7 +690,8 @@ bool DebugConsole::HandleKey(int key)
     break;
 
     case 13:
-    case 271: // numeric enter
+    case KEY_ENTER:
+    case KEY_KP_ENTER:
     {
       SetVisible(false);
 
@@ -702,13 +703,15 @@ bool DebugConsole::HandleKey(int key)
       break;
 
     case 8:
+    case KEY_BACKSPACE:
     {
       if (fLine.size() > 0)
         fLine.pop_back();
     }
     break;
 
-    case 9: // command completion
+    case 9:
+    case KEY_TAB: // command completion
     {
       ExpandCommand();
 
@@ -718,12 +721,12 @@ bool DebugConsole::HandleKey(int key)
     break;
 
     // command backbuffer
-    case SDLK_UP:
-    case SDLK_DOWN:
+    case KEY_UP:
+    case KEY_DOWN:
     {
       if (fBackBuffer.size() > 0)
       {
-        fBackIndex += (key == SDLK_UP) ? -1 : 1;
+        fBackIndex += (key == KEY_UP) ? -1 : 1;
         if (fBackIndex < 0)
           fBackIndex = (fBackBuffer.size() - 1);
         else

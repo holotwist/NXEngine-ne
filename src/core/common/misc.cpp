@@ -6,17 +6,16 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctype.h>
-#include <SDL.h>
 #if defined(_WIN32)
 #include <windows.h>
 #endif
 
 #include "basics.h"
 #include "misc.h"
-#include "../Utils/Logger.h"
-//#include "../game.h"
+#include "../utils/Logger.h"
 
-#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+// Check endianness using standard built-in macros
+#if !defined(__BYTE_ORDER__) || (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 uint16_t fgeti(FILE *fp)
 {
   uint16_t value;

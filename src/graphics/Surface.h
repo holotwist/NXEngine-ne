@@ -2,11 +2,10 @@
 #ifndef _SURFACE_H
 #define _SURFACE_H
 
-#include "../common/basics.h"
-
-#include <SDL.h>
-#include <string>
+#include "basics.h"
 #include "types.h"
+#include <raylib.h>
+#include <string>
 
 namespace NXE
 {
@@ -22,14 +21,14 @@ public:
   bool loadImage(const std::string &pbm_name, bool use_colorkey = false);
   static Surface *fromFile(const std::string &pbm_name, bool use_colorkey = false);
 
-  int width();
-  int height();
-  SDL_Texture* texture();
+  int width() const;
+  int height() const;
+  const Texture2D &texture() const;
 
 private:
   void cleanup();
 
-  SDL_Texture *_texture;
+  Texture2D _texture;
   int _width;
   int _height;
 
@@ -37,7 +36,7 @@ public:
   int alpha = 255;
 };
 
-}; // namespace Graphics
-}; // namespace NXE
+} // namespace Graphics
+} // namespace NXE
 
 #endif

@@ -54,36 +54,40 @@ bool ResourceManager::fileExists(const std::string &filename)
   return false;
 }
 
+#include <raylib.h>
+
 std::string ResourceManager::getBasePath()
 {
-  #if defined(__SWITCH__)
-    return std::string("romfs:/");
-  #else
-    char* resPath = SDL_GetBasePath();
-    if (NULL != resPath)
-    {
-        std::string strpath(resPath);
-        SDL_free(resPath);
-        return strpath;
-    }
-    return std::string("");
-  #endif
+  const char *dir = GetApplicationDirectory();
+  if (dir && dir[0] != '\0')
+    return std::string(dir);
+  return std::string("./");
 }
 
 std::string ResourceManager::getUserPrefPath()
 {
-#if defined(__SWITCH__)
-  return std::string("/switch/nxengine/");
+#if defined(PLATFORM_ANDROID)
+  const char *internalPath = GetApplicationDirectory();
+  if (internalPath) return std::string(internalPath) + "/";
+  return std::string("./");
 #else
-  char *path = SDL_GetPrefPath(NULL, "nxengine");
-  if (NULL != path)
+  const char *home = getenv("XDG_DATA_HOME");
+  if (home && home[0] != '\0')
   {
-    std::string strpath(path);
-    SDL_free(path);
-    return strpath;
+    std::string pref = std::string(home) + "/nxengine-ne/";
+    mkdir(pref.c_str(), 0755);
+    return pref;
   }
-
-  return std::string("");
+  home = getenv("HOME");
+  if (home && home[0] != '\0')
+  {
+    std::string pref = std::string(home) + "/.local/share/nxengine-ne/";
+    mkdir((std::string(home) + "/.local").c_str(), 0755);
+    mkdir((std::string(home) + "/.local/share").c_str(), 0755);
+    mkdir(pref.c_str(), 0755);
+    return pref;
+  }
+  return std::string("./");
 #endif
 }
 

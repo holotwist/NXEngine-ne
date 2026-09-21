@@ -1,609 +1,304 @@
-#include <algorithm>
-#include <cassert>
-// graphics routines
-#include "../ResourceManager.h"
-#include "../config.h"
-#include "../game.h"
-#include "../map.h"
-#include "../nx.h"
-#include "../pause/dialog.h"
-#include "../version.h"
 #include "Renderer.h"
-#include "nx_icon.h"
-#include "pngfuncs.h"
-#include "../Utils/Logger.h"
-
-#include <SDL.h>
-#include <SDL_image.h>
-#include <cstdlib>
-#include <sstream>
-#include <iomanip>
+#include "core/object.h"
+#include "core/utils/Logger.h"
+#include "platform/ResourceManager.h"
+#include "core/version.h"
+#include <cmath>
+#include <algorithm>
 
 namespace NXE
 {
 namespace Graphics
 {
 
-Renderer::Renderer() {}
-Renderer::~Renderer() {}
+static const gres_t g_resolutions[] = {
+  {"320x240 (4:3)",    320,  240, 320, 240, 1, false, true},
+  {"426x240 (16:9)",   426,  240, 426, 240, 1, true,  true},
+  {"854x480 (16:9)",   854,  480, 426, 240, 2, true,  true},
+  {"1280x720 (16:9)",  1280, 720, 426, 240, 3, true,  true},
+  {"1920x1080 (16:9)", 1920, 1080, 426, 240, 4, true,  true},
+  {nullptr, 0, 0, 0, 0, 0, false, false}
+};
+
+Renderer::Renderer()
+{
+  _target.id = 0;
+  _spotLightTex.id = 0;
+}
+
+Renderer::~Renderer()
+{
+  close();
+}
 
 Renderer *Renderer::getInstance()
 {
-  return Singleton<Renderer>::get();
+  static Renderer instance;
+  return &instance;
 }
 
 bool Renderer::init(int resolution)
 {
-  _current_res = resolution;
-  if (!initVideo())
-    return false;
+  _currentRes = resolution;
+  const gres_t *res = getResolutions();
 
-  if (!font.load())
-    return false;
+  screenWidth  = res[_currentRes].base_width;
+  screenHeight = res[_currentRes].base_height;
+  widescreen   = res[_currentRes].widescreen;
+  scale        = res[_currentRes].scale;
 
-  if (!sprites.init())
-    return false;
+  SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
+  InitWindow(res[_currentRes].width, res[_currentRes].height, NXVERSION);
+  SetWindowMinSize(320, 240);
+
+  _target = LoadRenderTexture(screenWidth, screenHeight);
+  SetTextureFilter(_target.texture, TEXTURE_FILTER_POINT);
+
+  std::string spotPath = ResourceManager::getInstance()->getPath("spot.png", false);
+  if (FileExists(spotPath.c_str()))
+  {
+    _spotLightTex = LoadTexture(spotPath.c_str());
+  }
+
+  if (!font.load()) return false;
+  if (!sprites.init()) return false;
 
   return true;
 }
 
 void Renderer::close()
 {
-  LOG_INFO("Renderer::Close()");
   font.cleanup();
   sprites.close();
-  SDL_ShowCursor(true);
-  SDL_DestroyWindow(_window);
-  _window = NULL;
+
+  if (_spotLightTex.id != 0)
+  {
+    UnloadTexture(_spotLightTex);
+    _spotLightTex.id = 0;
+  }
+  if (_target.id != 0)
+  {
+    UnloadRenderTexture(_target);
+    _target.id = 0;
+  }
+  if (IsWindowReady())
+  {
+    CloseWindow();
+  }
 }
 
 bool Renderer::isWindowVisible()
 {
-  Uint32 flags = SDL_GetWindowFlags(_window);
-
-  return (flags & SDL_WINDOW_SHOWN) && !(flags & SDL_WINDOW_MINIMIZED) // SDL_APPACTIVE
-         && (flags & SDL_WINDOW_INPUT_FOCUS);                          // SDL_APPINPUTFOCUS
-}
-
-bool Renderer::initVideo()
-{
-  uint32_t window_flags = SDL_WINDOW_SHOWN;
-
-  const NXE::Graphics::gres_t *res = getResolutions(true);
-
-  uint32_t width  = res[_current_res].width;
-  uint32_t height = res[_current_res].height;
-  scale        = res[_current_res].scale;
-  screenHeight = res[_current_res].base_height;
-  screenWidth  = res[_current_res].base_width;
-  widescreen   = res[_current_res].widescreen;
-
-  if (_window)
-  {
-    LOG_WARN("second call to Renderer::InitVideo()");
-    return false;
-  }
-
-  LOG_DEBUG("SDL_CreateWindow: {}x{}", width, height);
-  _window = SDL_CreateWindow(NXVERSION, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, window_flags);
-
-  if (!_window)
-  {
-    LOG_ERROR("Renderer::initVideo: error setting video mode (SDL_CreateWindow: {})", SDL_GetError());
-    return false;
-  }
-
-#if not defined(__VITA__) && not defined(__SWITCH__)
-  SDL_Surface *icon;
-  icon = SDL_CreateRGBSurfaceFrom((void *)WINDOW_TITLE_ICON.pixel_data, WINDOW_TITLE_ICON.width,
-                                  WINDOW_TITLE_ICON.height, WINDOW_TITLE_ICON.bytes_per_pixel * 8,
-                                  WINDOW_TITLE_ICON.bytes_per_pixel * WINDOW_TITLE_ICON.width,
-#if (SDL_BYTEORDER == SDL_BIG_ENDIAN)
-                                  0xff000000, /* Red bit mask. */
-                                  0x00ff0000, /* Green bit mask. */
-                                  0x0000ff00, /* Blue bit mask. */
-                                  0x000000ff  /* Alpha bit mask. */
-#else
-                                  0x000000ff, /* Red bit mask. */
-                                  0x0000ff00, /* Green bit mask. */
-                                  0x00ff0000, /* Blue bit mask. */
-                                  0xff000000  /* Alpha bit mask. */
-#endif
-  );
-  SDL_SetWindowIcon(_window, icon);
-  SDL_FreeSurface(icon);
-#endif
-
-  if (!_renderer)
-  {
-    _renderer = SDL_CreateRenderer(_window, -1, SDL_RENDERER_ACCELERATED);
-  }
-  if (!_renderer)
-  {
-    LOG_ERROR("Renderer::initVideo: error setting video mode (SDL_CreateRenderer: {})", SDL_GetError());
-    return false;
-  }
-
-  SDL_RendererInfo info;
-  if (SDL_GetRendererInfo(_renderer, &info))
-  {
-    LOG_ERROR("Renderer::initVideo: SDL_GetRendererInfo failed: {}", SDL_GetError());
-    return false;
-  }
-
-  LOG_INFO("Renderer::initVideo: using: {} renderer", info.name);
-
-  std::string spotpath = ResourceManager::getInstance()->getPath("spot.png");
-
-  SDL_Surface *image;
-  image = IMG_Load(spotpath.c_str());
-  _spot_light = SDL_CreateTextureFromSurface(_renderer, image);
-  SDL_FreeSurface(image);
-
-  return true;
-}
-
-bool Renderer::flushAll()
-{
-  LOG_DEBUG("Renderer::flushAll()");
-  SDL_RenderPresent(_renderer);
-  sprites.flushSheets();
-  tileset.reload();
-  map_flush_graphics();
-  if (!font.load())
-    return false;
-
-  return true;
+  return !IsWindowMinimized() && !IsWindowHidden();
 }
 
 void Renderer::setFullscreen(bool enable)
 {
-  SDL_ShowCursor(!enable);
-  SDL_SetWindowFullscreen(_window, (enable ? SDL_WINDOW_FULLSCREEN : 0));
+  if (IsWindowFullscreen() != enable)
+  {
+    ToggleFullscreen();
+  }
 }
 
-bool Renderer::setResolution(int r, bool restoreOnFailure)
+bool Renderer::setResolution(int factor, bool restoreOnFailure)
 {
-#if defined(__VITA__) || defined(__SWITCH__)
-  r = 1; // one fixed resolution
-#endif
+  (void)restoreOnFailure;
+  const gres_t *res = getResolutions();
+  int count = getResolutionCount();
+  if (factor < 0 || factor >= count) return false;
 
-  LOG_INFO("Renderer::setResolution({})", r);
-  if (r == _current_res)
-    return 0;
+  _currentRes  = factor;
+  screenWidth  = res[_currentRes].base_width;
+  screenHeight = res[_currentRes].base_height;
+  widescreen   = res[_currentRes].widescreen;
+  scale        = res[_currentRes].scale;
 
-  uint32_t width  = screenWidth;
-  uint32_t height = screenHeight;
+  SetWindowSize(res[_currentRes].width, res[_currentRes].height);
 
-  if (r == 0)
-  {
-    scale = 1;
-    widescreen = false;
-  }
-  else
-  {
-    const NXE::Graphics::gres_t *res = getResolutions();
-    scale        = res[r].scale;
-    screenHeight = res[r].base_height;
-    screenWidth  = res[r].base_width;
-    widescreen   = res[r].widescreen;
-    width        = res[r].width;
-    height       = res[r].height;
-  }
+  if (_target.id != 0) UnloadRenderTexture(_target);
+  _target = LoadRenderTexture(screenWidth, screenHeight);
+  SetTextureFilter(_target.texture, TEXTURE_FILTER_POINT);
 
-  LOG_INFO("Setting scaling {}", scale);
-
-  SDL_SetWindowSize(_window, width, height);
-
-  _current_res = r;
-
-  if (!flushAll())
-    return false;
-
-  recalc_map_offsets();
-  textbox.RecalculateOffsets();
-
-  return true;
+  return flushAll();
 }
 
-const Graphics::gres_t *Renderer::getResolutions(bool full_list)
+const gres_t *Renderer::getResolutions(bool full_list)
 {
-  static NXE::Graphics::gres_t res[]
-      = {//      description, screen_w, screen_h, render_w, render_h, scale_factor, widescreen, enabled
-         // 4:3
-         {(char *)"---", 0, 0, 0, 0, 1, false, true},
-#if defined(__VITA__)
-         {(char *)"960x544", 960, 544, 480, 272, 2, true, true},
-#elif defined(__SWITCH__)
-         {(char *)"1920x1080", 1920, 1080, 480, 270, 4, true, true},
-#else
-         {(char *)"320x240", 320, 240, 320, 240, 1, false, true},
-         {(char *)"640x480", 640, 480, 320, 240, 2, false, true},
-         //        {(char*)"800x600",   800,      600,      320,      240,      2.5,          false,      true },
-         //        //requires float scalefactor
-         {(char *)"1024x768", 1024, 768, 341, 256, 3, false, true},
-         {(char *)"1280x1024", 1280, 1024, 320, 256, 4, false, true},
-         {(char *)"1600x1200", 1600, 1200, 320, 240, 5, false, true},
-         // widescreen
-         {(char *)"480x272", 480, 272, 480, 272, 1, true, true},
-         {(char *)"800x480", 800, 480, 400, 240, 2, true, true},
-         {(char *)"1024x600", 1024, 600, 512, 300, 2, true, true},
-         {(char *)"1280x720", 1280, 720, 427, 240, 3, true, true},
-         {(char *)"1280x800", 1280, 800, 427, 267, 3, true, true},
-         {(char *)"1360x768", 1360, 768, 454, 256, 3, true, true},
-         {(char *)"1366x768", 1366, 768, 455, 256, 3, true, true},
-         {(char *)"1440x900", 1440, 900, 480, 300, 3, true, true},
-         {(char *)"1600x900", 1600, 900, 533, 300, 3, true, true},
-         {(char *)"1920x1080", 1920, 1080, 480, 270, 4, true, true},
-         {(char *)"2560x1440", 2560, 1440, 512, 288, 5, true, true},
-         {(char *)"3840x2160", 3840, 2160, 480, 270, 8, true, true},
-#endif
-         {NULL, 0, 0, 0, 0, 0, false, false}};
-
-  if (!full_list)
-  {
-      int displayIdx = SDL_GetWindowDisplayIndex(_window);
-      LOG_DEBUG("Display idx: {}",displayIdx);
-      SDL_DisplayMode dm;
-      SDL_GetDesktopDisplayMode(displayIdx, &dm);
-
-      LOG_INFO("Display W: {}, Display H: {}", dm.w, dm.h);
-      for (int i = 0; res[i].name; i++)
-      {
-        if (res[i].width > (uint32_t)dm.w || res[i].height > (uint32_t)dm.h)
-        {
-          LOG_INFO("Disabling {}", res[i].name);
-
-          res[i].enabled = false;
-        }
-      }
-  }
-  return res;
+  (void)full_list;
+  return g_resolutions;
 }
 
 int Renderer::getResolutionCount()
 {
-  int i;
-  const gres_t *res = getResolutions();
-
-  for (i = 0; res[i].name; i++)
-    ;
+  int i = 0;
+  while (g_resolutions[i].name != nullptr) i++;
   return i;
+}
+
+bool Renderer::flushAll()
+{
+  sprites.flushSheets();
+  tileset.reload();
+  return font.load();
 }
 
 void Renderer::showLoadingScreen()
 {
   Surface loading;
-
-  if (!loading.loadImage(ResourceManager::getInstance()->getPath("Loading.pbm")))
-    return;
+  if (!loading.loadImage(ResourceManager::getInstance()->getPath("Loading.pbm", false))) return;
 
   int x = (screenWidth / 2) - (loading.width() / 2);
   int y = (screenHeight / 2) - loading.height();
 
+  beginFrame();
   clearScreen(BLACK);
   drawSurface(&loading, x, y);
+  endFrame();
   flip();
 }
 
-SDL_Renderer* Renderer::renderer()
+void Renderer::beginFrame()
 {
-  return _renderer;
+  BeginTextureMode(_target);
 }
 
-SDL_Window* Renderer::window()
+void Renderer::endFrame()
 {
-  return _window;
+  if (_clipActive) clearClip();
+  EndTextureMode();
 }
 
 void Renderer::flip()
 {
-//  LOG_INFO("===FLIPPING===\n");
-  SDL_RenderPresent(_renderer);
-//  LOG_INFO("===FLIPPED===\n");
+  BeginDrawing();
+  ClearBackground(::BLACK);
+
+  // Pillarbox/letterbox target presentation
+  float scaleFactor = std::min((float)GetScreenWidth() / (float)screenWidth,
+                               (float)GetScreenHeight() / (float)screenHeight);
+
+  Rectangle src = { 0.0f, 0.0f, (float)screenWidth, -(float)screenHeight }; // Invert Y for FBO
+  Rectangle dst = {
+    (GetScreenWidth() - ((float)screenWidth * scaleFactor)) * 0.5f,
+    (GetScreenHeight() - ((float)screenHeight * scaleFactor)) * 0.5f,
+    (float)screenWidth * scaleFactor,
+    (float)screenHeight * scaleFactor
+  };
+
+  DrawTexturePro(_target.texture, src, dst, Vector2{0.0f, 0.0f}, 0.0f, ::WHITE);
+  EndDrawing();
 }
 
-// blit the specified portion of the surface to the screen
 void Renderer::drawSurface(Surface *src, int dstx, int dsty, int srcx, int srcy, int wd, int ht)
 {
-  assert(_renderer);
-  assert(src->texture());
+  if (!src || src->texture().id == 0) return;
 
-  SDL_Rect srcrect, dstrect;
+  Rectangle srcRec = { (float)srcx, (float)srcy, (float)wd, (float)ht };
+  Rectangle dstRec = { (float)dstx, (float)dsty, (float)wd, (float)ht };
+  Color tint = ColorAlpha(::WHITE, (float)src->alpha / 255.0f);
 
-  srcrect.x = srcx * scale;
-  srcrect.y = srcy * scale;
-  srcrect.w = wd * scale;
-  srcrect.h = ht * scale;
-
-  dstrect.x = dstx * scale;
-  dstrect.y = dsty * scale;
-  dstrect.w = srcrect.w;
-  dstrect.h = srcrect.h;
-
-  if (_need_clip)
-    clipScaled(srcrect, dstrect);
-
-  SDL_SetTextureAlphaMod(src->texture(), src->alpha);
-  if (SDL_RenderCopy(_renderer, src->texture(), &srcrect, &dstrect))
-  {
-    LOG_ERROR("Renderer::drawSurface: SDL_RenderCopy failed: {}", SDL_GetError());
-  }
+  DrawTexturePro(src->texture(), srcRec, dstRec, Vector2{0.0f, 0.0f}, 0.0f, tint);
 }
 
-// blit the specified portion of the surface to the screen
 void Renderer::drawSurfaceMirrored(Surface *src, int dstx, int dsty, int srcx, int srcy, int wd, int ht)
 {
-  assert(_renderer);
-  assert(src->texture());
+  if (!src || src->texture().id == 0) return;
 
-  SDL_Rect srcrect, dstrect;
+  Rectangle srcRec = { (float)srcx, (float)srcy, -(float)wd, (float)ht }; // Negative width mirrors
+  Rectangle dstRec = { (float)dstx, (float)dsty, (float)wd, (float)ht };
+  Color tint = ColorAlpha(::WHITE, (float)src->alpha / 255.0f);
 
-  srcrect.x = srcx * scale;
-  srcrect.y = srcy * scale;
-  srcrect.w = wd * scale;
-  srcrect.h = ht * scale;
+  DrawTexturePro(src->texture(), srcRec, dstRec, Vector2{0.0f, 0.0f}, 0.0f, tint);
+}
 
-  dstrect.x = dstx * scale;
-  dstrect.y = dsty * scale;
-  dstrect.w = srcrect.w;
-  dstrect.h = srcrect.h;
+void Renderer::blitPatternAcross(Surface *sfc, int x_dst, int y_dst, int y_src, int height)
+{
+  if (!sfc || sfc->texture().id == 0) return;
 
-  if (_need_clip)
-    clipScaled(srcrect, dstrect);
+  int w = sfc->width();
+  int x = x_dst;
 
-  SDL_SetTextureAlphaMod(src->texture(), src->alpha);
-  if (SDL_RenderCopyEx(_renderer, src->texture(), &srcrect, &dstrect, 0, NULL, SDL_FLIP_HORIZONTAL))
+  while (x < screenWidth)
   {
-    LOG_ERROR("Renderer::drawSurface: SDL_RenderCopy failed: {}", SDL_GetError());
+    drawSurface(sfc, x, y_dst, 0, y_src, w, height);
+    x += w;
   }
 }
 
-// blit the specified surface across the screen in a repeating pattern
-void Renderer::blitPatternAcross(Surface *sfc, int x_dst, int y_dst, int y_src, int height)
+void Renderer::clearScreen(NXColor color)
 {
-  SDL_Rect srcrect, dstrect;
-
-  srcrect.x = 0;
-  srcrect.w = sfc->width() * scale;
-  srcrect.y = (y_src * scale);
-  srcrect.h = (height * scale);
-
-  dstrect.w = srcrect.w;
-  dstrect.h = srcrect.h;
-
-  int x      = (x_dst * scale);
-  int y      = (y_dst * scale);
-  int destwd = screenWidth * scale;
-
-  assert(!_need_clip && "clip for blitpattern is not implemented");
-
-  do
-  {
-    dstrect.x = x;
-    dstrect.y = y;
-    SDL_RenderCopy(_renderer, sfc->texture(), &srcrect, &dstrect);
-    x += sfc->width()  * scale;
-  } while (x < destwd);
-}
-
-void Renderer::drawLine(int x1, int y1, int x2, int y2, NXColor color)
-{
-  SDL_SetRenderDrawColor(_renderer, color.r, color.g, color.b, SDL_ALPHA_OPAQUE);
-  SDL_RenderDrawLine(_renderer, x1 * scale, y1 * scale, x2 * scale, y2 * scale);
-}
-
-void Renderer::drawRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
-{
-  SDL_Rect rects[4] = {{x1 * scale, y1 * scale, ((x2 - x1) + 1) * scale, scale},
-  {x1 * scale, y2 * scale, ((x2 - x1) + 1) * scale, scale},
-  {x1 * scale, y1 * scale, scale, ((y2 - y1) + 1) * scale},
-  {x2 * scale, y1 * scale, scale, ((y2 - y1) + 1) * scale}};
-
-  SDL_SetRenderDrawColor(_renderer, r, g, b, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRects(_renderer, rects, 4);
-}
-
-void Renderer::fillRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
-{
-  SDL_Rect rect;
-
-  rect.x = x1 * scale;
-  rect.y = y1 * scale;
-  rect.w = ((x2 - x1) + 1) * scale;
-  rect.h = ((y2 - y1) + 1) * scale;
-
-  SDL_SetRenderDrawColor(_renderer, r, g, b, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRect(_renderer, &rect);}
-
-void Renderer::tintScreen()
-{
-  SDL_SetRenderDrawBlendMode(_renderer,SDL_BLENDMODE_BLEND);
-  SDL_SetRenderDrawColor(_renderer, 0, 0, 0, 150);
-  SDL_RenderFillRect(_renderer, NULL);
-}
-
-void Renderer::drawPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
-{
-  fillRect(x, y, x, y, r, g, b);
+  ClearBackground(color.toRaylib());
 }
 
 void Renderer::clearScreen(uint8_t r, uint8_t g, uint8_t b)
 {
-  SDL_SetRenderDrawColor(_renderer, r, g, b, SDL_ALPHA_OPAQUE);
-  SDL_RenderFillRect(_renderer, NULL);
+  ClearBackground(Color{r, g, b, 255});
+}
+
+void Renderer::drawLine(int x1, int y1, int x2, int y2, NXColor color)
+{
+  DrawLine(x1, y1, x2, y2, color.toRaylib());
+}
+
+void Renderer::drawRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
+{
+  DrawRectangleLines(x1, y1, (x2 - x1) + 1, (y2 - y1) + 1, Color{r, g, b, 255});
+}
+
+void Renderer::fillRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b)
+{
+  DrawRectangle(x1, y1, (x2 - x1) + 1, (y2 - y1) + 1, Color{r, g, b, 255});
+}
+
+void Renderer::drawPixel(int x, int y, uint8_t r, uint8_t g, uint8_t b)
+{
+  DrawPixel(x, y, Color{r, g, b, 255});
 }
 
 void Renderer::setClip(int x, int y, int w, int h)
 {
-  _need_clip = true;
-
-  _clip_rect.x = x * scale;
-  _clip_rect.y = y * scale;
-  _clip_rect.w = w * scale;
-  _clip_rect.h = h * scale;
+  if (_clipActive) EndScissorMode();
+  _clipRect = Rectangle{(float)x, (float)y, (float)w, (float)h};
+  _clipActive = true;
+  BeginScissorMode(x, y, w, h);
 }
 
 void Renderer::clearClip()
 {
-  _need_clip = false;
+  if (_clipActive)
+  {
+    EndScissorMode();
+    _clipActive = false;
+  }
 }
 
 bool Renderer::isClipSet()
 {
-  return _need_clip;
+  return _clipActive;
 }
 
-void Renderer::clip(SDL_Rect &srcrect, SDL_Rect &dstrect)
+void Renderer::tintScreen()
 {
-  int w,h;
-  int dx, dy;
-
-  w = dstrect.w;
-  h = dstrect.h;
-
-  dx = _clip_rect.x - dstrect.x;
-  if (dx > 0)
-  {
-    w -= dx;
-    dstrect.x += dx;
-    srcrect.x += dx / scale;
-  }
-  dx = dstrect.x + w - _clip_rect.x - _clip_rect.w;
-  if (dx > 0)
-    w -= dx;
-
-  dy = _clip_rect.y - dstrect.y;
-  if (dy > 0)
-  {
-    h -= dy;
-    dstrect.y += dy;
-    srcrect.y += dy / scale;
-  }
-  dy = dstrect.y + h - _clip_rect.y - _clip_rect.h;
-  if (dy > 0)
-    h -= dy;
-
-  dstrect.w = w;
-  dstrect.h = h;
-  srcrect.w = w / scale;
-  srcrect.h = h / scale;
+  DrawRectangle(0, 0, screenWidth, screenHeight, Color{0, 0, 0, 150});
 }
 
-void Renderer::clipScaled(SDL_Rect &srcrect, SDL_Rect &dstrect)
+void Renderer::drawSpotLight(int x, int y, Object *o, int r, int g, int b, int upscale)
 {
-  int w, h;
-  int dx, dy;
+  if (_spotLightTex.id == 0 || !o) return;
 
-  w = dstrect.w;
-  h = dstrect.h;
+  int w = (o->Width() / CSFI) * upscale;
+  int h = (o->Height() / CSFI) * upscale;
 
-  dx = _clip_rect.x - dstrect.x;
-  if (dx > 0)
-  {
-    w -= dx;
-    dstrect.x += dx;
-    srcrect.x += dx;
-  }
-  dx = dstrect.x + w - _clip_rect.x - _clip_rect.w;
-  if (dx > 0)
-    w -= dx;
+  Rectangle src = {0.0f, 0.0f, (float)_spotLightTex.width, (float)_spotLightTex.height};
+  Rectangle dst = {(float)(x - (w / 2)), (float)(y - (h / 2)), (float)w, (float)h};
 
-  dy = _clip_rect.y - dstrect.y;
-  if (dy > 0)
-  {
-    h -= dy;
-    dstrect.y += dy;
-    srcrect.y += dy;
-  }
-  dy = dstrect.y + h - _clip_rect.y - _clip_rect.h;
-  if (dy > 0)
-    h -= dy;
-
-  dstrect.w = srcrect.w = w;
-  dstrect.h = srcrect.h = h;
+  DrawTexturePro(_spotLightTex, src, dst, Vector2{0.0f, 0.0f}, 0.0f, Color{(uint8_t)r, (uint8_t)g, (uint8_t)b, 255});
 }
 
 void Renderer::saveScreenshot()
 {
-  auto filename = []()
-  {
-    int iter = 0;
-    std::string name;
-    do
-    {
-      std::ostringstream oss;
-      oss << "screenshot";
-      oss << std::setfill('0') << std::setw(3);
-      oss << ++iter;
-      oss << ".png";
-      name = ResourceManager::getInstance()->getPrefPath(oss.str());
-    } while (ResourceManager::getInstance()->fileExists(name) && iter < 1000);
-    if (ResourceManager::getInstance()->fileExists(name))
-    {
-        return std::string();
-    }
-    return name;
-  }();
-
-  if (filename.empty())
-  {
-    LOG_ERROR("Can not get screenshot name. Too many screenshots in folder");
-    return;
-  }
-
-  SDL_Rect viewport;
-  SDL_RenderGetViewport(_renderer, &viewport);
-  SDL_Surface* surface = SDL_CreateRGBSurface(0, viewport.w, viewport.h, 24,
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-                                 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
-#else
-                                 0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
-#endif
-  );
-
-  if (!surface)
-  {
-    LOG_ERROR("Couldn't create surface: {}", SDL_GetError());
-    return;
-  }
-
-  if (SDL_RenderReadPixels(_renderer, NULL, surface->format->format, surface->pixels, surface->pitch) < 0)
-  {
-    LOG_ERROR("Couldn't read screen: {}", SDL_GetError());
-    return;
-  }
-
-  if (png_save_surface(filename, surface) < 0)
-  {
-    SDL_FreeSurface(surface);
-    LOG_ERROR("Couldn't save screen");
-    return;
-  }
-  SDL_FreeSurface(surface);
-  LOG_INFO("Saved {}", filename);
-  return;
+  TakeScreenshot("screenshot.png");
 }
 
-void Renderer::drawSpotLight(int x, int y, Object* o, int r, int g, int b, int upscale)
-{
-  SDL_Rect dstrec;
-  int width = o->Width() / CSFI;
-  int height = o->Height() / CSFI;
-
-  x *= scale;
-  y *= scale;
-
-  dstrec.x = (x - (width * (upscale / 2) * scale) + (width / 2 * scale));
-  dstrec.y = (y - (height * (upscale / 2) * scale) + (height / 2 * scale));
-  dstrec.w = width * upscale * scale;
-  dstrec.h = height * upscale * scale;
-
-  SDL_SetTextureColorMod(_spot_light, r, g, b);
-  SDL_RenderCopy(_renderer, _spot_light, NULL, &dstrec);
-}
-
-
-
-};
-};
+} // namespace Graphics
+} // namespace NXE

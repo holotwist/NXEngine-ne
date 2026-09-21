@@ -1,15 +1,15 @@
 #include "Sprites.h"
 
-#include "../autogen/sprites.h"
-#include "../ResourceManager.h"
-#include "../nx.h"
-#include "../settings.h"
-#include "../siflib/sectSprites.h"
-#include "../siflib/sectStringArray.h"
-#include "../siflib/sifloader.h"
+#include "sprites.h"
+#include "ResourceManager.h"
+#include "nx.h"
+#include "settings.h"
+#include "siflib/sectSprites.h"
+#include "siflib/sectStringArray.h"
+#include "siflib/sifloader.h"
 #include "Renderer.h"
 #include "Surface.h"
-#include "../Utils/Logger.h"
+#include "Logger.h"
 
 #include <cstring>
 

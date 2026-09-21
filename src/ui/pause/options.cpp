@@ -72,7 +72,7 @@ static struct
   int xoffset;
 
   int32_t remapping_key;
-  in_action new_sdl_key;
+  in_action new_input_key;
 } opt;
 
 bool options_init(int retmode)
@@ -574,30 +574,15 @@ static void _upd_control(ODItem *item)
 
   if (action.key != -1)
   {
-    int keysym = action.key;
-    snprintf(keyname, 64, "%s", SDL_GetKeyName((SDL_Keycode)keysym));
+    snprintf(keyname, 64, "%s", get_key_name(action.key));
   }
-  else if (action.jbut != -1)
+  else if (action.gamepad_button != -1)
   {
-    snprintf(keyname, 64, "JBut %d", action.jbut);
+    snprintf(keyname, 64, "Btn %d", action.gamepad_button);
   }
-  else if (action.jaxis != -1)
+  else
   {
-    if (action.jaxis_value > 0)
-      snprintf(keyname, 64, "JAxis %d+", action.jaxis);
-    else
-      snprintf(keyname, 64, "JAxis %d-", action.jaxis);
-  }
-  else if (action.jhat != -1)
-  {
-    if (action.jhat_value & SDL_HAT_LEFT)
-      snprintf(keyname, 64, "JHat %d L", action.jhat);
-    else if (action.jhat_value & SDL_HAT_RIGHT)
-      snprintf(keyname, 64, "JHat %d R", action.jhat);
-    else if (action.jhat_value & SDL_HAT_UP)
-      snprintf(keyname, 64, "JHat %d U", action.jhat);
-    else if (action.jhat_value & SDL_HAT_DOWN)
-      snprintf(keyname, 64, "JHat %d D", action.jhat);
+    snprintf(keyname, 64, "---");
   }
 
   maxcpy(item->righttext, _(keyname).c_str(), sizeof(item->righttext) - 1);
@@ -607,14 +592,12 @@ static void _edit_control(ODItem *item, int dir)
 {
   Message *msg;
 
-  opt.remapping_key     = item->id;
-  opt.new_sdl_key.key   = -1;
-  opt.new_sdl_key.jbut  = -1;
-  opt.new_sdl_key.jhat  = -1;
-  opt.new_sdl_key.jaxis = -1;
+  opt.remapping_key           = item->id;
+  opt.new_input_key.key       = -1;
+  opt.new_input_key.gamepad_button = -1;
 
   msg               = new Message("Press new key for:", input_get_name(opt.remapping_key));
-  msg->rawKeyReturn = &opt.new_sdl_key;
+  msg->rawKeyReturn = &opt.new_input_key;
   msg->on_dismiss   = _finish_control_edit;
 
   NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_DOOR);
@@ -622,50 +605,29 @@ static void _edit_control(ODItem *item, int dir)
 
 static void _finish_control_edit(Message *msg)
 {
-  int inputno           = opt.remapping_key;
-  in_action new_sdl_key = opt.new_sdl_key;
-  int i;
-  in_action action = input_get_mapping(inputno);
+  int inputno             = opt.remapping_key;
+  in_action new_input_key = opt.new_input_key;
 
-  // check if key is already in use
-  for (i = 0; i < INPUT_COUNT; i++)
+  // Check if key is already bound
+  for (int i = 0; i < INPUT_COUNT; i++)
   {
-    action = input_get_mapping(i);
-    if (i != inputno && action.key != -1 && action.key == new_sdl_key.key)
+    in_action action = input_get_mapping(i);
+    if (i != inputno && new_input_key.key != -1 && action.key == new_input_key.key)
     {
       new Message("Key already in use by:", input_get_name(i));
       NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_GUN_CLICK);
       return;
     }
 
-    if (i != inputno && action.jbut != -1 && action.jbut == new_sdl_key.jbut)
+    if (i != inputno && new_input_key.gamepad_button != -1 && action.gamepad_button == new_input_key.gamepad_button)
     {
       new Message("Key already in use by:", input_get_name(i));
       NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_GUN_CLICK);
       return;
-    }
-
-    if (i != inputno && action.jhat != -1 && action.jhat == new_sdl_key.jhat
-        && action.jhat_value & new_sdl_key.jhat_value)
-    {
-      new Message("Key already in use by:", input_get_name(i));
-      NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_GUN_CLICK);
-      return;
-    }
-
-    if (i != inputno && action.jaxis != -1 && action.jaxis == new_sdl_key.jaxis)
-    {
-      if (((action.jaxis_value > 0) && (new_sdl_key.jaxis_value > 0))
-          || ((action.jaxis_value < 0) && (new_sdl_key.jaxis_value < 0)))
-      {
-        new Message("Key already in use by:", input_get_name(i));
-        NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_GUN_CLICK);
-        return;
-      }
     }
   }
 
-  input_remap(inputno, new_sdl_key);
+  input_remap(inputno, new_input_key);
   NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_MENU_SELECT);
   opt.dlg->Refresh();
 }

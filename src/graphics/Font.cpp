@@ -1,336 +1,193 @@
 #include "Font.h"
-
-#include "../ResourceManager.h"
-#include "../common/misc.h"
-#include "../Utils/Logger.h"
 #include "Renderer.h"
-#include "../autogen/sprites.h"
-#include "../config.h"
-#include "../game.h"
-#include "../nx.h"
+#include "platform/ResourceManager.h"
+#include "core/common/misc.h"
+#include "core/utils/Logger.h"
+#include "core/game.h"
+#include "autogen/sprites.h"
 
-#include <SDL_image.h>
 #include <json.hpp>
 #include <utf8.h>
 #include <fstream>
-#include <iostream>
-
-using namespace NXE::Graphics;
+#include <cmath>
 
 namespace NXE
 {
 namespace Graphics
 {
 
-Font::Font()
-    : _height(0)
-    , _base(0)
+Font::Font() {}
+Font::~Font() { cleanup(); }
+
+void Font::cleanup()
 {
+  if (_useRayFont)
+  {
+    UnloadFont(_rayFont);
+    _useRayFont = false;
+  }
+
+  for (auto &atlas : _atlases)
+  {
+    UnloadTexture(atlas);
+  }
+  _atlases.clear();
+  _glyphs.clear();
 }
 
 bool Font::load()
 {
   cleanup();
-  std::string font = std::string("font_" + std::to_string(Renderer::getInstance()->scale) + ".fnt");
-  LOG_DEBUG("Loading font file {}", font.c_str());
 
-  // special empty glyph
-  _glyphs[0] = Font::Glyph{0, 0, 0, 0, 0, 0, 0, 0, 0};
+  // Try loading Unifont from resources/
+  std::string unifontPath = "resources/unifont.otf";
+  if (!FileExists(unifontPath.c_str()))
+    unifontPath = "resources/unifont.ttf";
 
-  std::string path = ResourceManager::getInstance()->getPath(font);
-  if (ResourceManager::getInstance()->fileExists(path))
+  if (FileExists(unifontPath.c_str()))
   {
-    _upscale = 1;
+    // Load Unifont at native 16px pixel height
+    _rayFont = LoadFontEx(unifontPath.c_str(), 16, nullptr, 0);
+    SetTextureFilter(_rayFont.texture, TEXTURE_FILTER_POINT);
+    _useRayFont = true;
+    _height = 16;
+    _base = 12;
+    LOG_INFO("Loaded Unifont successfully from '{}'", unifontPath);
+    return true;
   }
-  else
+
+  // Fallback to bundled font_*.fnt BMFont
+  std::string fontFnt = ResourceManager::getInstance()->getPath("font_1.fnt", false);
+  std::ifstream fl(widen(fontFnt), std::ifstream::in | std::ifstream::binary);
+  if (!fl.is_open())
   {
-    _upscale = Renderer::getInstance()->scale;
-    font = std::string("font_1.fnt");
-    path = ResourceManager::getInstance()->getPath(font);
-  }
-
-  LOG_DEBUG("Loading font file {}", path.c_str());
-
-  std::ifstream fl;
-  fl.open(widen(path), std::ifstream::in | std::ifstream::binary);
-  if (fl.is_open())
-  {
-    nlohmann::json fontdef = nlohmann::json::parse(fl);
-
-    _height = fontdef["common"]["lineHeight"].get<uint32_t>();
-    _base   = fontdef["common"]["base"].get<uint32_t>();
-
-    for (auto glyph : fontdef["chars"])
-    {
-      _glyphs[glyph["id"].get<uint32_t>()] = Font::Glyph{
-          glyph["id"].get<uint32_t>(),       glyph["page"].get<uint32_t>(),    glyph["x"].get<uint32_t>(),
-          glyph["y"].get<uint32_t>(),        glyph["width"].get<uint32_t>(),   glyph["height"].get<uint32_t>(),
-          glyph["xadvance"].get<uint32_t>(), glyph["xoffset"].get<uint32_t>(), glyph["yoffset"].get<uint32_t>()};
-    }
-
-    for (auto atlas : fontdef["pages"])
-    {
-      std::string atlaspath = ResourceManager::getInstance()->getPath(atlas.get<std::string>());
-      SDL_Surface *surf     = IMG_Load(atlaspath.c_str());
-      _atlases.push_back(SDL_CreateTextureFromSurface(Renderer::getInstance()->renderer(), surf));
-      SDL_FreeSurface(surf);
-    }
-  }
-  else
-  {
-    LOG_ERROR("Error opening font file {}", path.c_str());
+    LOG_ERROR("Failed to load font file: {}", fontFnt);
     return false;
+  }
+
+  nlohmann::json fontdef = nlohmann::json::parse(fl, nullptr, false);
+  if (fontdef.is_discarded()) return false;
+
+  _height = fontdef["common"]["lineHeight"].get<uint32_t>();
+  _base   = fontdef["common"]["base"].get<uint32_t>();
+
+  for (auto &glyph : fontdef["chars"])
+  {
+    _glyphs[glyph["id"].get<uint32_t>()] = Glyph{
+      glyph["id"].get<uint32_t>(),
+      glyph["page"].get<uint32_t>(),
+      glyph["x"].get<uint32_t>(),
+      glyph["y"].get<uint32_t>(),
+      glyph["width"].get<uint32_t>(),
+      glyph["height"].get<uint32_t>(),
+      glyph["xadvance"].get<uint32_t>(),
+      glyph["xoffset"].get<uint32_t>(),
+      glyph["yoffset"].get<uint32_t>()
+    };
+  }
+
+  for (auto &atlas : fontdef["pages"])
+  {
+    std::string atlasPath = ResourceManager::getInstance()->getPath(atlas.get<std::string>(), false);
+    Texture2D tex = LoadTexture(atlasPath.c_str());
+    SetTextureFilter(tex, TEXTURE_FILTER_POINT);
+    _atlases.push_back(tex);
   }
 
   return true;
 }
 
-void Font::cleanup()
+const Font::Glyph &Font::getGlyph(uint32_t codepoint)
 {
-  _height = 0;
-  _base   = 0;
-  _glyphs.clear();
-  for (auto atlas : _atlases)
-  {
-    SDL_DestroyTexture(atlas);
-  }
-  _atlases.clear();
-  _upscale = 1;
+  auto it = _glyphs.find(codepoint);
+  if (it != _glyphs.end()) return it->second;
+  static Glyph empty{0, 0, 0, 0, 0, 0, 0, 0, 0};
+  return empty;
 }
 
-Font::~Font()
+Texture2D Font::getAtlas(uint32_t idx)
 {
-  cleanup();
-}
-
-const Font::Glyph &Font::glyph(uint32_t codepoint)
-{
-  if (_glyphs.find(codepoint) != _glyphs.end())
-  {
-    return _glyphs.at(codepoint);
-  }
-  else
-  {
-    LOG_WARN("No glyph for codepoint {}", codepoint);
-    return _glyphs.at(0);
-  }
-}
-
-SDL_Texture *Font::atlas(uint32_t idx)
-{
-  return _atlases.at(idx);
+  if (idx < _atlases.size()) return _atlases[idx];
+  return Texture2D{0};
 }
 
 uint32_t Font::draw(int x, int y, const std::string &text, uint32_t color, bool isShaded)
 {
-  x *= Renderer::getInstance()->scale;
-  y *= Renderer::getInstance()->scale;
-
-  int orgx = x;
-  int i    = 0;
-  SDL_Rect dstrect;
-  SDL_Rect shdrect;
-  SDL_Rect srcrect;
-
-  int r, g, b;
-
-  r = ((color >> 16) & 0xFF);
-  g = ((color >> 8) & 0xFF);
-  b = ((color)&0xFF);
-
-  std::string::const_iterator it = (rtl() ? text.end() : text.begin());
-  while (it != (rtl() ? text.begin() : text.end()) )
-  {
-    char32_t ch;
-    if (rtl()) ch = utf8::prior(it, text.begin());
-    else ch = utf8::next(it, text.end());
-
-    Glyph glyph = this->glyph(ch);
-    SDL_Texture *atlas  = this->atlas(glyph.atlasid);
-
-    if (ch == '=' && game.mode != GM_CREDITS)
-    {
-      if (_rendering)
-      {
-        int offset = (int)round(((double)_height / (double)Renderer::getInstance()->scale - 6.) / 2.);
-        Renderer::getInstance()->sprites.drawSprite((x / Renderer::getInstance()->scale), (y / Renderer::getInstance()->scale) + offset, SPR_TEXTBULLET);
-      }
-    }
-    else if (_rendering && ch != ' ')
-    {
-      dstrect.x = x + (glyph.xoffset * _upscale);
-      dstrect.y = y + (glyph.yoffset * _upscale);
-      dstrect.w = glyph.w * _upscale;
-      dstrect.h = glyph.h * _upscale;
-
-      srcrect.x = glyph.x;
-      srcrect.y = glyph.y;
-      srcrect.w = glyph.w;
-      srcrect.h = glyph.h;
-
-      if (Renderer::getInstance()->isClipSet())
-      {
-        if (_upscale > 1)
-          Renderer::getInstance()->clip(srcrect, dstrect);
-        else
-          Renderer::getInstance()->clipScaled(srcrect, dstrect);
-      }
-      if (isShaded)
-      {
-        shdrect.x = x + (glyph.xoffset * _upscale);
-        shdrect.y = y + (glyph.yoffset * _upscale + _shadowOffset * Renderer::getInstance()->scale);
-        shdrect.w = glyph.w * _upscale;
-        shdrect.h = glyph.h * _upscale;
-        SDL_SetTextureColorMod(atlas, 0, 0, 0);
-        SDL_RenderCopy(Renderer::getInstance()->renderer(), atlas, &srcrect, &shdrect);
-        SDL_SetTextureColorMod(atlas, 255, 255, 255);
-      }
-      SDL_SetTextureColorMod(atlas, r, g, b);
-      SDL_RenderCopy(Renderer::getInstance()->renderer(), atlas, &srcrect, &dstrect);
-      SDL_SetTextureColorMod(atlas, 255, 255, 255);
-    }
-
-    if (ch == ' ')
-    { // 10.5 px for spaces - make smaller than they really are - the default
-      if (rtl())
-      {
-        x -= (Renderer::getInstance()->scale == 1) ? 5 : 10;
-        if (i & 1)
-          x--;
-      }
-      else
-      {
-        x += (Renderer::getInstance()->scale == 1) ? 5 : 10;
-        if (i & 1)
-          x++;
-      }
-    }
-    else if (ch == '=' && game.mode != GM_CREDITS)
-    {
-      if (rtl()) x -= 7 * Renderer::getInstance()->scale;
-      else x += 7 * Renderer::getInstance()->scale;
-    }
-    else
-    {
-      if (rtl()) x -= glyph.xadvance * _upscale;
-      else x += glyph.xadvance * _upscale;
-    }
-    i++;
-  }
-
-  // return the final width of the text drawn
-  return abs((x - orgx) / Renderer::getInstance()->scale);
+  return drawLTR(x, y, text, color, isShaded);
 }
 
 uint32_t Font::drawLTR(int x, int y, const std::string &text, uint32_t color, bool isShaded)
 {
-  x *= Renderer::getInstance()->scale;
-  y *= Renderer::getInstance()->scale;
-
   int orgx = x;
-  int i    = 0;
-  SDL_Rect dstrect;
-  SDL_Rect shdrect;
-  SDL_Rect srcrect;
+  Color c = Color{
+    (uint8_t)((color >> 16) & 0xFF),
+    (uint8_t)((color >> 8) & 0xFF),
+    (uint8_t)(color & 0xFF),
+    255
+  };
 
-  int r, g, b;
-
-  r = ((color >> 16) & 0xFF);
-  g = ((color >> 8) & 0xFF);
-  b = ((color)&0xFF);
-
-  std::string::const_iterator it = text.begin();
-  while (it != text.end() )
+  // Fast-path, Unifont rendering via Raylib
+  if (_useRayFont)
   {
-    char32_t ch;
-    ch = utf8::next(it, text.end());
+    if (_rendering)
+    {
+      if (isShaded)
+        DrawTextEx(_rayFont, text.c_str(), Vector2{(float)x + 1, (float)y + 1}, 16.0f, 0.0f, ::BLACK);
+      DrawTextEx(_rayFont, text.c_str(), Vector2{(float)x, (float)y}, 16.0f, 0.0f, c);
+    }
+    return (uint32_t)MeasureTextEx(_rayFont, text.c_str(), 16.0f, 0.0f).x;
+  }
 
-    Glyph glyph = this->glyph(ch);
-    SDL_Texture *atlas  = this->atlas(glyph.atlasid);
-
-    if (ch == '=' && game.mode != GM_CREDITS)
+  // BMFont Atlas rendering
+  auto it = text.begin();
+  while (it != text.end())
+  {
+    char32_t ch = utf8::next(it, text.end());
+    if (ch == '=')
     {
       if (_rendering)
-      {
-        int offset = (int)round(((double)_height / (double)Renderer::getInstance()->scale - 6.) / 2.);
-        Renderer::getInstance()->sprites.drawSprite((x / Renderer::getInstance()->scale), (y / Renderer::getInstance()->scale) + offset, SPR_TEXTBULLET);
-      }
-    }
-    else if (_rendering && ch != ' ')
-    {
-      dstrect.x = x + (glyph.xoffset * _upscale);
-      dstrect.y = y + (glyph.yoffset * _upscale);
-      dstrect.w = glyph.w * _upscale;
-      dstrect.h = glyph.h * _upscale;
-
-      srcrect.x = glyph.x;
-      srcrect.y = glyph.y;
-      srcrect.w = glyph.w;
-      srcrect.h = glyph.h;
-
-      if (Renderer::getInstance()->isClipSet())
-      {
-        if (_upscale > 1)
-          Renderer::getInstance()->clip(srcrect, dstrect);
-        else
-          Renderer::getInstance()->clipScaled(srcrect, dstrect);
-      }
-      if (isShaded)
-      {
-        shdrect.x = x + (glyph.xoffset * _upscale);
-        shdrect.y = y + glyph.yoffset * _upscale + _shadowOffset * Renderer::getInstance()->scale;
-        shdrect.w = glyph.w * _upscale;
-        shdrect.h = glyph.h * _upscale;
-        SDL_SetTextureColorMod(atlas, 0, 0, 0);
-        SDL_RenderCopy(Renderer::getInstance()->renderer(), atlas, &srcrect, &shdrect);
-        SDL_SetTextureColorMod(atlas, 255, 255, 255);
-      }
-      SDL_SetTextureColorMod(atlas, r, g, b);
-      SDL_RenderCopy(Renderer::getInstance()->renderer(), atlas, &srcrect, &dstrect);
-      SDL_SetTextureColorMod(atlas, 255, 255, 255);
+        Renderer::getInstance()->sprites.drawSprite(x, y + 2, SPR_TEXTBULLET);
+      x += 7;
+      continue;
     }
 
     if (ch == ' ')
-    { // 10.5 px for spaces - make smaller than they really are - the default
-      x += (Renderer::getInstance()->scale == 1) ? 5 : 10;
-      if (i & 1)
-        x++;
-    }
-    else if (ch == '=' && game.mode != GM_CREDITS)
     {
-      x += 7 * Renderer::getInstance()->scale;
+      x += 5;
+      continue;
     }
-    else
+
+    const Glyph &g = getGlyph(ch);
+    Texture2D atlas = getAtlas(g.atlasid);
+
+    if (_rendering && atlas.id != 0)
     {
-      x += glyph.xadvance * _upscale;
+      Rectangle src{(float)g.x, (float)g.y, (float)g.w, (float)g.h};
+      if (isShaded)
+      {
+        Rectangle dstShd{(float)(x + g.xoffset + 1), (float)(y + g.yoffset + 1), (float)g.w, (float)g.h};
+        DrawTexturePro(atlas, src, dstShd, Vector2{0, 0}, 0.0f, ::BLACK);
+      }
+      Rectangle dst{(float)(x + g.xoffset), (float)(y + g.yoffset), (float)g.w, (float)g.h};
+      DrawTexturePro(atlas, src, dst, Vector2{0, 0}, 0.0f, c);
     }
-    i++;
+
+    x += g.xadvance;
   }
 
-  // return the final width of the text drawn
-  return abs((x - orgx) / Renderer::getInstance()->scale);
+  return (uint32_t)(x - orgx);
 }
 
 uint32_t Font::getWidth(const std::string &text)
 {
   _rendering = false;
-
-  uint32_t wd = draw(0, 0, text);
-
+  uint32_t w = draw(0, 0, text);
   _rendering = true;
-
-  return wd;
+  return w;
 }
 
-uint32_t Font::getHeight() const
-{
-  return _height / ((_upscale == 1) ? Renderer::getInstance()->scale : 1);
-}
+uint32_t Font::getHeight() const { return _height; }
+uint32_t Font::getBase() const   { return _base; }
 
-uint32_t Font::getBase() const
-{
-  return _base / ((_upscale == 1) ? Renderer::getInstance()->scale : 1);
-}
-
-}; // namespace Graphics
-}; // namespace NXE
+} // namespace Graphics
+} // namespace NXE

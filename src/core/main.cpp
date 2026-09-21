@@ -20,8 +20,7 @@
 #include "trig.h"
 #include "tsc.h"
 
-#include <SDL_mixer.h>
-#include <SDL_image.h>
+#include <raylib.h>
 using namespace NXE::Graphics;
 #include "ResourceManager.h"
 #include "caret.h"

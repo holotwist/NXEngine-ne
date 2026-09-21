@@ -1,10 +1,11 @@
 #ifndef _BMFONT_H
 #define _BMFONT_H
 
-#include <SDL.h>
+#include <raylib.h>
 #include <map>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 namespace NXE
 {
@@ -18,39 +19,39 @@ public:
   {
     uint32_t glyph_id;
     uint32_t atlasid;
-    uint32_t x;
-    uint32_t y;
-    uint32_t w;
-    uint32_t h;
-    uint32_t xadvance;
-    uint32_t xoffset;
-    uint32_t yoffset;
+    uint32_t x, y, w, h;
+    uint32_t xadvance, xoffset, yoffset;
   };
 
   Font();
   ~Font();
+
   bool load();
   void cleanup();
-  const Font::Glyph &glyph(uint32_t codepoint);
-  SDL_Texture *atlas(uint32_t idx);
+
   uint32_t draw(int x, int y, const std::string &text, uint32_t color = 0xFFFFFF, bool isShaded = false);
   uint32_t drawLTR(int x, int y, const std::string &text, uint32_t color = 0xFFFFFF, bool isShaded = false);
   uint32_t getWidth(const std::string &text);
   uint32_t getHeight() const;
   uint32_t getBase() const;
 
-
 private:
-  std::vector<SDL_Texture *> _atlases;
+  const Glyph &getGlyph(uint32_t codepoint);
+  Texture2D getAtlas(uint32_t idx);
+
+  // Unifont / TTF support via Raylib
+  ::Font _rayFont;
+  bool _useRayFont = false;
+
+  // BMFont Fallback
+  std::vector<Texture2D> _atlases;
   std::map<uint32_t, Glyph> _glyphs;
-  uint32_t _height;
-  uint32_t _base;
-  uint32_t _upscale;
-  bool _rendering = true;
-  const uint8_t _shadowOffset = 1;
+  uint32_t _height = 12;
+  uint32_t _base   = 10;
+  bool _rendering  = true;
 };
 
-}; // namespace NXE
-}; // namespace Graphics
+} // namespace Graphics
+} // namespace NXE
 
 #endif

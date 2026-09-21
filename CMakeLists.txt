@@ -141,6 +141,9 @@ if(NOT ANDROID)
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/data
         $<TARGET_FILE_DIR:nxengine-ne>/data
-        COMMENT "Syncing data directory to output folder..."
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources
+        $<TARGET_FILE_DIR:nxengine-ne>/resources
+        COMMENT "Syncing data and resources to output folder..."
     )
 endif()

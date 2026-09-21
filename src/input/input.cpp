@@ -1,449 +1,203 @@
-
 #include "input.h"
-
-#include "Utils/Logger.h"
 #include "console.h"
-#include "game.h"
-#include "nx.h"
-#include "settings.h"
-#include "sound/SoundManager.h"
-
-#include <array>
-
-in_action mappings[INPUT_COUNT];
+#include <raylib.h>
+#include <cstring>
 
 bool inputs[INPUT_COUNT];
 bool lastinputs[INPUT_COUNT];
-in_action last_sdl_action;
-SDL_Joystick *joy;
+in_action mappings[INPUT_COUNT];
+in_action last_input_action = { -1, -1 };
 
 int ACCEPT_BUTTON = JUMPKEY;
 int DECLINE_BUTTON = FIREKEY;
 
-
 bool input_init(void)
 {
-  memset(inputs, 0, sizeof(inputs));
-  memset(lastinputs, 0, sizeof(lastinputs));
-  memset(mappings, -1, sizeof(mappings));
-  for (int i = 0; i < INPUT_COUNT; i++)
-  {
-    mappings[i].key   = -1;
-    mappings[i].jbut  = -1;
-    mappings[i].jhat  = -1;
-    mappings[i].jaxis = -1;
-  }
+  std::memset(inputs, 0, sizeof(inputs));
+  std::memset(lastinputs, 0, sizeof(lastinputs));
 
-  // default mappings
-  mappings[LEFTKEY].key      = SDLK_LEFT;
-  mappings[RIGHTKEY].key     = SDLK_RIGHT;
-  mappings[UPKEY].key        = SDLK_UP;
-  mappings[DOWNKEY].key      = SDLK_DOWN;
-  mappings[JUMPKEY].key      = SDLK_z;
-  mappings[FIREKEY].key      = SDLK_x;
-  mappings[STRAFEKEY].key    = SDLK_c;
-  mappings[PREVWPNKEY].key   = SDLK_a;
-  mappings[NEXTWPNKEY].key   = SDLK_s;
-  mappings[INVENTORYKEY].key = SDLK_q;
-  mappings[MAPSYSTEMKEY].key = SDLK_w;
+  // Default Keyboard and gamepad bindings
+  mappings[LEFTKEY]      = { KEY_LEFT,   GAMEPAD_BUTTON_LEFT_FACE_LEFT };
+  mappings[RIGHTKEY]     = { KEY_RIGHT,  GAMEPAD_BUTTON_LEFT_FACE_RIGHT };
+  mappings[UPKEY]        = { KEY_UP,     GAMEPAD_BUTTON_LEFT_FACE_UP };
+  mappings[DOWNKEY]      = { KEY_DOWN,   GAMEPAD_BUTTON_LEFT_FACE_DOWN };
+  mappings[JUMPKEY]      = { KEY_Z,      GAMEPAD_BUTTON_RIGHT_FACE_DOWN };
+  mappings[FIREKEY]      = { KEY_X,      GAMEPAD_BUTTON_RIGHT_FACE_RIGHT };
+  mappings[STRAFEKEY]    = { KEY_C,      GAMEPAD_BUTTON_LEFT_TRIGGER_1 };
+  mappings[PREVWPNKEY]   = { KEY_A,      GAMEPAD_BUTTON_LEFT_TRIGGER_1 };
+  mappings[NEXTWPNKEY]   = { KEY_S,      GAMEPAD_BUTTON_RIGHT_TRIGGER_1 };
+  mappings[INVENTORYKEY] = { KEY_Q,      GAMEPAD_BUTTON_RIGHT_FACE_LEFT };
+  mappings[MAPSYSTEMKEY] = { KEY_W,      GAMEPAD_BUTTON_RIGHT_FACE_UP };
 
-  mappings[ESCKEY].key = SDLK_ESCAPE;
+  mappings[ESCKEY]   = { KEY_ESCAPE, GAMEPAD_BUTTON_MIDDLE_LEFT };
+  mappings[ENTERKEY] = { KEY_ENTER,  GAMEPAD_BUTTON_MIDDLE_RIGHT };
 
-#if defined(__VITA__)
-  mappings[MAPSYSTEMKEY].jbut = 0; // Triangle
-  mappings[FIREKEY].jbut      = 1; // Circle
-  mappings[JUMPKEY].jbut      = 2; // Cross
-  mappings[INVENTORYKEY].jbut = 3; // Square
-  mappings[PREVWPNKEY].jbut   = 4; // LTrig
-  mappings[NEXTWPNKEY].jbut   = 5; // Rtrig
+  mappings[F1KEY] = { KEY_F1, -1 };
+  mappings[F2KEY] = { KEY_F2, -1 };
+  mappings[F3KEY] = { KEY_F3, -1 };
+  mappings[F4KEY] = { KEY_F4, -1 };
+  mappings[F5KEY] = { KEY_F5, -1 };
+  mappings[F6KEY] = { KEY_F6, -1 };
+  mappings[F7KEY] = { KEY_F7, -1 };
+  mappings[F8KEY] = { KEY_F8, -1 };
+  mappings[F9KEY] = { KEY_F9, -1 };
 
-  mappings[DOWNKEY].jbut  = 6;
-  mappings[LEFTKEY].jbut  = 7;
-  mappings[UPKEY].jbut    = 8;
-  mappings[RIGHTKEY].jbut = 9;
-  mappings[ESCKEY].jbut   = 11;
-#endif
+  mappings[FREEZE_FRAME_KEY]  = { KEY_SPACE, -1 };
+  mappings[FRAME_ADVANCE_KEY] = { KEY_B, -1 };
+  mappings[DEBUG_FLY_KEY]     = { KEY_V, -1 };
 
-#if defined(__SWITCH__)
-  mappings[LEFTKEY].jbut      = 16;
-  mappings[UPKEY].jbut        = 17;
-  mappings[RIGHTKEY].jbut     = 18;
-  mappings[DOWNKEY].jbut      = 19;
-
-  mappings[FIREKEY].jbut      = 1;  // A
-  mappings[JUMPKEY].jbut      = 0;  // B
-  mappings[MAPSYSTEMKEY].jbut = 3;  // X
-  mappings[INVENTORYKEY].jbut = 2;  // Y
-
-  mappings[PREVWPNKEY].jbut   = 6;  // L
-  mappings[NEXTWPNKEY].jbut   = 7;  // R
-
-  mappings[ENTERKEY].jbut     = 10; // +
-  mappings[ESCKEY].jbut       = 11; // -
-#endif
-
-  mappings[F1KEY].key  = SDLK_F1;
-  mappings[F2KEY].key  = SDLK_F2;
-  mappings[F3KEY].key  = SDLK_F3;
-  mappings[F4KEY].key  = SDLK_F4;
-  mappings[F5KEY].key  = SDLK_F5;
-  mappings[F6KEY].key  = SDLK_F6;
-  mappings[F7KEY].key  = SDLK_F7;
-  mappings[F8KEY].key  = SDLK_F8;
-  mappings[F9KEY].key  = SDLK_F9;
-  mappings[F10KEY].key = SDLK_F10;
-  mappings[F11KEY].key = SDLK_F11;
-  mappings[F12KEY].key = SDLK_F12;
-  mappings[FREEZE_FRAME_KEY].key  = SDLK_SPACE;
-  mappings[FRAME_ADVANCE_KEY].key = SDLK_b;
-  mappings[DEBUG_FLY_KEY].key     = SDLK_v;
-  mappings[ENTERKEY].key = SDLK_RETURN;
-
-  SDL_InitSubSystem(SDL_INIT_JOYSTICK);
-  if (SDL_NumJoysticks() > 0)
-  {
-    // Open joystick
-    joy = SDL_JoystickOpen(0);
-
-    if (joy)
-    {
-      LOG_INFO("Opened Joystick 0");
-      LOG_INFO("Name: {}", SDL_JoystickNameForIndex(0));
-      LOG_INFO("Number of Axes: {}", SDL_JoystickNumAxes(joy));
-      LOG_INFO("Number of Buttons: {}", SDL_JoystickNumButtons(joy));
-      LOG_INFO("Number of Balls: {}", SDL_JoystickNumBalls(joy));
-    }
-    else
-    {
-      LOG_WARN("Couldn't open Joystick 0");
-    }
-  }
-  return 0;
+  return true;
 }
 
-void rumble(float str, uint32_t len)
-{
-  if (settings->rumble)
-    SDL_JoystickRumble(joy, 0xFFFF * str, 0xFFFF * str, len);
-}
-
-// set the SDL key that triggers an input
-void input_remap(int keyindex, in_action sdl_key)
-{
-  LOG_DEBUG("input_remap(%d => %d)", keyindex, sdl_key.key);
-  //	in_action old_mapping = input_get_mapping(keyindex);
-  //	if (old_mapping != -1)
-  //		mappings[old_mapping] = 0xff;
-
-  mappings[keyindex] = sdl_key;
-}
-
-// get which SDL key triggers a given input
-in_action input_get_mapping(int keyindex)
-{
-  return mappings[keyindex];
-}
-
-int input_get_action(int32_t sdlkey)
-{
-  for (int i = 0; i < INPUT_COUNT; i++)
-  {
-    if (mappings[i].key == sdlkey)
-    {
-      return i;
-    }
-  }
-  return -1;
-}
-
-int input_get_action_but(int32_t jbut)
-{
-  for (int i = 0; i < INPUT_COUNT; i++)
-  {
-    if (mappings[i].jbut == jbut)
-    {
-      return i;
-    }
-  }
-  return -1;
-}
-
-int input_get_action_hat(int32_t jhat, int32_t jvalue)
-{
-  for (int i = 0; i < INPUT_COUNT; i++)
-  {
-    if ((mappings[i].jhat == jhat) && (jvalue & mappings[i].jhat_value))
-    {
-      return i;
-    }
-  }
-  return -1;
-}
-
-int input_get_action_axis(int32_t jaxis, int32_t jvalue)
-{
-  for (int i = 0; i < INPUT_COUNT; i++)
-  {
-    if ((mappings[i].jaxis == jaxis)
-        && ((jvalue > 0 && mappings[i].jaxis_value > 0) || (jvalue < 0 && mappings[i].jaxis_value < 0)))
-    {
-      return i;
-    }
-  }
-  return -1;
-}
-
-const std::string input_get_name(int index)
-{
-  static std::array<std::string, 28> input_names = {"Left",         "Right",
-                                                    "Up",           "Down",
-                                                    "Jump",         "Fire",
-                                                    "Strafe",       "Wpn Prev",
-                                                    "Wpn Next",     "Inventory",
-                                                    "Map",          "Pause",
-                                                    "f1",           "f2",
-                                                    "f3",           "f4",
-                                                    "f5",           "f6",
-                                                    "f7",           "f8",
-                                                    "f9",           "f10",
-                                                    "f11",          "f12",
-                                                    "freeze frame", "frame advance",
-                                                    "debug fly",    "Enter"};
-
-  if (index < 0 || index >= INPUT_COUNT)
-    return "invalid";
-
-  return input_names[index];
-}
-
-void input_set_mappings(in_action *array)
-{
-  for (int i = 0; i < INPUT_COUNT; i++) {
-    if (array[i].key > 0 || array[i].jbut != -1 || array[i].jaxis != -1 || array[i].jhat != -1)
-      mappings[i] = array[i];
-  }
-}
-
-/*
-void c------------------------------() {}
-*/
-
-// keys that we don't want to send to the console
-// even if the console is up.
-static int IsNonConsoleKey(int key)
-{
-  static const int nosend[] = {SDLK_LEFT, SDLK_RIGHT, 0};
-
-  for (int i = 0; nosend[i]; i++)
-    if (key == nosend[i])
-      return true;
-
-  return false;
-}
+void input_close(void) {}
 
 void input_poll(void)
 {
-  SDL_Event evt;
-  int32_t key;
-  int ino; //, key;
+  std::memcpy(lastinputs, inputs, sizeof(inputs));
 
-  while (SDL_PollEvent(&evt))
+  // Handle debug console toggle
+  if (IsKeyPressed(KEY_GRAVE))
   {
-    switch (evt.type)
-    {
-      case SDL_KEYDOWN:
-      case SDL_KEYUP:
-      {
-        key = evt.key.keysym.sym;
-
-        static uint8_t shiftstates = 0;
-
-        if (console.IsVisible() && !IsNonConsoleKey(key))
-        {
-          if (key == SDLK_LSHIFT)
-          {
-            if (evt.type == SDL_KEYDOWN)
-              shiftstates |= LEFTMASK;
-            else
-              shiftstates &= ~LEFTMASK;
-          }
-          else if (key == SDLK_RSHIFT)
-          {
-            if (evt.type == SDL_KEYDOWN)
-              shiftstates |= RIGHTMASK;
-            else
-              shiftstates &= ~RIGHTMASK;
-          }
-          else
-          {
-            int ch = key;
-            if (shiftstates != 0)
-            {
-              ch = toupper(ch);
-              if (ch == '.')
-                ch = '>';
-              if (ch == '-')
-                ch = '_';
-              if (ch == '/')
-                ch = '?';
-              if (ch == '1')
-                ch = '!';
-            }
-
-            if (evt.type == SDL_KEYDOWN)
-              console.HandleKey(ch);
-            else
-              console.HandleKeyRelease(ch);
-          }
-        }
-        else
-        {
-          ino = input_get_action(key); // mappings[key];
-
-          if (ino != -1)
-            inputs[ino] = (evt.type == SDL_KEYDOWN);
-
-          if (evt.type == SDL_KEYDOWN)
-          {
-            if (key == '`') // bring up console
-            {
-#if defined(DEBUG)
-              extern bool freezeframe;
-              if (!freezeframe)
-              {
-                NXE::Sound::SoundManager::getInstance()->playSfx(NXE::Sound::SFX::SND_SWITCH_WEAPON);
-                console.SetVisible(true);
-              }
-#endif
-            }
-            else
-            {
-              last_sdl_action.key = key;
-            }
-          }
-        }
-      }
-      break;
-
-      case SDL_QUIT:
-      {
-        inputs[ESCKEY] = true;
-        game.running   = false;
-      }
-      break;
-
-      case SDL_JOYBUTTONDOWN:
-      {
-        Uint8 but            = evt.jbutton.button;
-        last_sdl_action.jbut = but;
-        ino                  = input_get_action_but(but); // mappings[key];
-        if (ino != -1)
-          inputs[ino] = (evt.jbutton.state == SDL_PRESSED);
-      }
-      break;
-
-      case SDL_JOYBUTTONUP:
-      {
-        Uint8 but = evt.jbutton.button;
-        ino       = input_get_action_but(but); // mappings[key];
-        if (ino != -1)
-          inputs[ino] = (evt.jbutton.state == SDL_PRESSED);
-      }
-      break;
-
-      case SDL_JOYHATMOTION:
-      {
-        if (evt.jhat.value != SDL_HAT_CENTERED)
-        {
-          last_sdl_action.jhat       = evt.jhat.hat;
-          last_sdl_action.jhat_value = evt.jhat.value;
-        }
-        ino = input_get_action_hat(evt.jhat.hat, evt.jhat.value); // mappings[key];
-        // cleanup all hat-binded states
-        for (int i = 0; i < INPUT_COUNT; i++)
-        {
-          if (mappings[i].jhat != -1)
-            inputs[i] = false;
-        }
-
-        if (ino != -1)
-          inputs[ino] = true;
-      }
-      break;
-
-      case SDL_JOYAXISMOTION:
-      {
-        // this only used for control remapping.
-        // for actual in-game handling see below.
-        if (evt.jaxis.value > 20000 || evt.jaxis.value < -20000) // dead zone
-        {
-          last_sdl_action.jaxis       = evt.jaxis.axis;
-          last_sdl_action.jaxis_value = evt.jaxis.value;
-        }
-      }
-      break;
-    }
+    console.SetVisible(!console.IsVisible());
   }
 
-  // handle gamepad sticks
+  // If console is visible, route text and navigation keys to console
+  if (console.IsVisible())
+  {
+    int charPressed = GetCharPressed();
+    while (charPressed > 0)
+    {
+      console.HandleKey(charPressed);
+      charPressed = GetCharPressed();
+    }
+
+    int keyPressed = GetKeyPressed();
+    while (keyPressed > 0)
+    {
+      console.HandleKey(keyPressed);
+      keyPressed = GetKeyPressed();
+    }
+    return;
+  }
+
+  int gamepad = 0;
+  bool hasGamepad = IsGamepadAvailable(gamepad);
+  float axisX = hasGamepad ? GetGamepadAxisMovement(gamepad, GAMEPAD_AXIS_LEFT_X) : 0.0f;
+  float axisY = hasGamepad ? GetGamepadAxisMovement(gamepad, GAMEPAD_AXIS_LEFT_Y) : 0.0f;
 
   for (int i = 0; i < INPUT_COUNT; i++)
   {
-    if (mappings[i].jaxis >= 0) // reset all mapped axises
+    bool down = false;
+
+    // Keyboard
+    if (mappings[i].key != -1 && IsKeyDown(mappings[i].key))
+      down = true;
+
+    // Gamepad buttons
+    if (hasGamepad && mappings[i].gamepad_button != -1)
     {
-      inputs[i] = false;
+      if (IsGamepadButtonDown(gamepad, mappings[i].gamepad_button))
+        down = true;
     }
+
+    // Left analog stick thresholding
+    if (hasGamepad)
+    {
+      if (i == LEFTKEY  && axisX < -0.5f) down = true;
+      if (i == RIGHTKEY && axisX >  0.5f) down = true;
+      if (i == UPKEY    && axisY < -0.5f) down = true;
+      if (i == DOWNKEY  && axisY >  0.5f) down = true;
+    }
+
+    #if defined(PLATFORM_ANDROID)
+    int touchCount = GetTouchPointCount();
+    for (int t = 0; t < touchCount; t++)
+    {
+      Vector2 pos = GetTouchPosition(t);
+      float sw = (float)GetScreenWidth();
+      float sh = (float)GetScreenHeight();
+
+      if (pos.x < sw * 0.35f)
+      {
+        if (i == LEFTKEY  && pos.x < sw * 0.15f) down = true;
+        if (i == RIGHTKEY && pos.x > sw * 0.15f) down = true;
+        if (i == UPKEY    && pos.y < sh * 0.65f) down = true;
+        if (i == DOWNKEY  && pos.y > sh * 0.75f) down = true;
+      }
+      if (pos.x > sw * 0.65f)
+      {
+        if (i == JUMPKEY && pos.y > sh * 0.6f) down = true;
+        if (i == FIREKEY && pos.y < sh * 0.6f) down = true;
+      }
+    }
+    #endif
+
+    inputs[i] = down;
   }
-
-  // now get current values of all axises
-  for (int ax = 0; ax < SDL_JoystickNumAxes(joy); ax++)
-  {
-    int value = SDL_JoystickGetAxis(joy, ax);
-    ino       = input_get_action_axis(ax, value); // this returns actual mapping for axis direction
-
-    if (ino != -1 && (value > 20000 || value < -20000))
-      inputs[ino] = true;
-  }
-}
-
-void input_close(void)
-{
-  // Close if opened
-  if (SDL_JoystickGetAttached(joy))
-  {
-    SDL_JoystickClose(joy);
-  }
-}
-
-/*
-void c------------------------------() {}
-*/
-
-static const int buttons[] = {JUMPKEY, FIREKEY, STRAFEKEY, ACCEPT_BUTTON, DECLINE_BUTTON, 0};
-
-bool buttondown(void)
-{
-  for (int i = 0; buttons[i]; i++)
-  {
-    if (inputs[buttons[i]])
-      return 1;
-  }
-
-  return 0;
-}
-
-bool buttonjustpushed(void)
-{
-  for (int i = 0; buttons[i]; i++)
-  {
-    if (inputs[buttons[i]] && !lastinputs[buttons[i]])
-      return 1;
-  }
-
-  return 0;
 }
 
 bool justpushed(int k)
 {
   return (inputs[k] && !lastinputs[k]);
+}
+
+bool buttondown(void)
+{
+  return (inputs[JUMPKEY] || inputs[FIREKEY] || inputs[STRAFEKEY]);
+}
+
+bool buttonjustpushed(void)
+{
+  return (justpushed(JUMPKEY) || justpushed(FIREKEY) || justpushed(STRAFEKEY));
+}
+
+void rumble(float str, uint32_t len)
+{
+  // Reserved for platform haptic implementation
+  (void)str; (void)len;
+}
+
+void input_remap(int index, in_action act) { if (index < INPUT_COUNT) mappings[index] = act; }
+in_action input_get_mapping(int index)     { return mappings[index]; }
+void input_set_mappings(in_action *array)  { std::memcpy(mappings, array, sizeof(mappings)); }
+
+const std::string input_get_name(int index)
+{
+  static const char *names[] = {
+    "Left", "Right", "Up", "Down", "Jump", "Fire", "Strafe", "Wpn Prev", "Wpn Next",
+    "Inventory", "Map", "Pause", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8",
+    "F9", "F10", "F11", "F12", "Freeze", "Step", "Fly", "Enter"
+  };
+  if (index >= 0 && index < INPUT_COUNT) return names[index];
+  return "Unknown";
+}
+
+const char *get_key_name(int key)
+{
+  switch (key)
+  {
+    case KEY_SPACE: return "Space";
+    case KEY_ESCAPE: return "Esc";
+    case KEY_ENTER: return "Enter";
+    case KEY_TAB: return "Tab";
+    case KEY_BACKSPACE: return "Backspace";
+    case KEY_UP: return "Up";
+    case KEY_DOWN: return "Down";
+    case KEY_LEFT: return "Left";
+    case KEY_RIGHT: return "Right";
+    case KEY_LEFT_SHIFT: return "LShift";
+    case KEY_RIGHT_SHIFT: return "RShift";
+    case KEY_LEFT_CONTROL: return "LCtrl";
+    case KEY_RIGHT_CONTROL: return "RCtrl";
+    case KEY_LEFT_ALT: return "LAlt";
+    case KEY_RIGHT_ALT: return "RAlt";
+    default:
+      if (key >= 32 && key <= 126)
+      {
+        static char ch[2] = {0, 0};
+        ch[0] = (char)key;
+        return ch;
+      }
+      return "Unknown";
+  }
 }
