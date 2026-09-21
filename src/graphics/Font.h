@@ -29,13 +29,27 @@ public:
   bool load();
   void cleanup();
 
+  struct TextDrawCmd
+  {
+    int x, y;
+    std::string text;
+    uint32_t color;
+    bool isShaded;
+    Rectangle clip;
+    bool clipActive;
+  };
+
   uint32_t draw(int x, int y, const std::string &text, uint32_t color = 0xFFFFFF, bool isShaded = false);
   uint32_t drawLTR(int x, int y, const std::string &text, uint32_t color = 0xFFFFFF, bool isShaded = false);
   uint32_t getWidth(const std::string &text);
   uint32_t getHeight() const;
   uint32_t getBase() const;
 
+  void flushQueue(float dstX, float dstY, float scaleFactor);
+  void clearQueue();
+
 private:
+  std::vector<TextDrawCmd> _queue;
   const Glyph &getGlyph(uint32_t codepoint);
   Texture2D getAtlas(uint32_t idx);
 

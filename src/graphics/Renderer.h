@@ -88,6 +88,7 @@ public:
   void setClip(NXRect *rect);
   void clearClip();
   bool isClipSet();
+  Rectangle getClip() const { return _clipRect; }
 
   void saveScreenshot();
   void drawSpotLight(int x, int y, Object *o, int r = 255, int g = 255, int b = 255, int upscale = 6);

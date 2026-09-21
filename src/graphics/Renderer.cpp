@@ -161,6 +161,7 @@ void Renderer::showLoadingScreen()
 
 void Renderer::beginFrame()
 {
+  font.clearQueue();
   BeginTextureMode(_target);
 }
 
@@ -188,6 +189,10 @@ void Renderer::flip()
   };
 
   DrawTexturePro(_target.texture, src, dst, Vector2{0.0f, 0.0f}, 0.0f, Color{255, 255, 255, 255});
+
+  // Render high-res text overlay
+  font.flushQueue(dst.x, dst.y, scaleFactor);
+
   EndDrawing();
 }
 

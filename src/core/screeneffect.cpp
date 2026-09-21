@@ -41,7 +41,7 @@ void SE_FlashScreen::Draw(void)
   }
 
   if (flashstate)
-    Renderer::getInstance()->clearScreen(0xff, 0xff, 0xff);
+    Renderer::getInstance()->fillRect(0, 0, Renderer::getInstance()->screenWidth, Renderer::getInstance()->screenHeight, 0xff, 0xff, 0xff);
 }
 
 /*
@@ -157,7 +157,12 @@ void SE_Fade::Start(int fadedir, int sweepdir, int spr)
 
   fade.fadedir  = fadedir;
   fade.sweepdir = sweepdir;
-  fade.curframe = (fadedir == FADE_OUT) ? -FADE_LAST_FRAME : FADE_LAST_FRAME;
+
+  int max_w = (Renderer::getInstance()->screenWidth / 16) + 2;
+  int max_h = (Renderer::getInstance()->screenHeight / 16) + 2;
+  int max_tiles = (max_w > max_h) ? max_w : max_h;
+
+  fade.curframe = (fadedir == FADE_OUT) ? -max_tiles : FADE_LAST_FRAME;
 }
 
 void SE_Fade::Draw(void)
@@ -170,7 +175,7 @@ void SE_Fade::Draw(void)
   }
   else if (state == FS_FADED_OUT)
   {
-    Renderer::getInstance()->clearScreen(DK_BLUE);
+    Renderer::getInstance()->fillRect(0, 0, Renderer::getInstance()->screenWidth, Renderer::getInstance()->screenHeight, DK_BLUE);
     return;
   }
 
@@ -182,11 +187,12 @@ void SE_Fade::Draw(void)
       {
         if (frame >= 0)
         {
-          if (frame > FADE_LAST_FRAME)
-            frame = FADE_LAST_FRAME;
+          int draw_frame = frame;
+          if (draw_frame > FADE_LAST_FRAME)
+            draw_frame = FADE_LAST_FRAME;
 
           for (y = 0; y < Renderer::getInstance()->screenHeight; y += 16)
-            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, frame);
+            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, draw_frame);
         }
         frame++;
       }
@@ -197,11 +203,12 @@ void SE_Fade::Draw(void)
       {
         if (frame >= 0)
         {
-          if (frame > FADE_LAST_FRAME)
-            frame = FADE_LAST_FRAME;
+          int draw_frame = frame;
+          if (draw_frame > FADE_LAST_FRAME)
+            draw_frame = FADE_LAST_FRAME;
 
           for (y = 0; y < Renderer::getInstance()->screenHeight; y += 16)
-            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, frame);
+            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, draw_frame);
         }
         frame++;
       }
@@ -212,11 +219,12 @@ void SE_Fade::Draw(void)
       {
         if (frame >= 0)
         {
-          if (frame > FADE_LAST_FRAME)
-            frame = FADE_LAST_FRAME;
+          int draw_frame = frame;
+          if (draw_frame > FADE_LAST_FRAME)
+            draw_frame = FADE_LAST_FRAME;
 
           for (x = 0; x < Renderer::getInstance()->screenWidth; x += 16)
-            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, frame);
+            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, draw_frame);
         }
         frame++;
       }
@@ -227,11 +235,12 @@ void SE_Fade::Draw(void)
       {
         if (frame >= 0)
         {
-          if (frame > FADE_LAST_FRAME)
-            frame = FADE_LAST_FRAME;
+          int draw_frame = frame;
+          if (draw_frame > FADE_LAST_FRAME)
+            draw_frame = FADE_LAST_FRAME;
 
           for (x = 0; x < Renderer::getInstance()->screenWidth; x += 16)
-            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, frame);
+            Renderer::getInstance()->sprites.drawSprite(x, y, fade.sprite, draw_frame);
         }
         frame++;
       }
@@ -251,13 +260,14 @@ void SE_Fade::Draw(void)
         {
           if (frame >= 0)
           {
-            if (frame > FADE_LAST_FRAME)
-              frame = FADE_LAST_FRAME;
+            int draw_frame = frame;
+            if (draw_frame > FADE_LAST_FRAME)
+              draw_frame = FADE_LAST_FRAME;
 
-            Renderer::getInstance()->sprites.drawSprite(centerx + x, centery + y, fade.sprite, frame);
-            Renderer::getInstance()->sprites.drawSprite(centerx - x, centery + y, fade.sprite, frame);
-            Renderer::getInstance()->sprites.drawSprite(centerx + x, centery - y, fade.sprite, frame);
-            Renderer::getInstance()->sprites.drawSprite(centerx - x, centery - y, fade.sprite, frame);
+            Renderer::getInstance()->sprites.drawSprite(centerx + x, centery + y, fade.sprite, draw_frame);
+            Renderer::getInstance()->sprites.drawSprite(centerx - x, centery + y, fade.sprite, draw_frame);
+            Renderer::getInstance()->sprites.drawSprite(centerx + x, centery - y, fade.sprite, draw_frame);
+            Renderer::getInstance()->sprites.drawSprite(centerx - x, centery - y, fade.sprite, draw_frame);
           }
 
           frame++;
@@ -278,7 +288,11 @@ void SE_Fade::Draw(void)
   else
   { // fading in--terminate fade when done
     fade.curframe--;
-    if (fade.curframe < -20)
+    int max_w = (Renderer::getInstance()->screenWidth / 16) + 2;
+    int max_h = (Renderer::getInstance()->screenHeight / 16) + 2;
+    int max_tiles = (max_w > max_h) ? max_w : max_h;
+    
+    if (fade.curframe < -max_tiles)
     {
       state   = FS_NO_FADE;
       enabled = false;
