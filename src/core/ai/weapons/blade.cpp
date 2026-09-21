@@ -1,11 +1,11 @@
 #include "blade.h"
 
-#include "../../ObjManager.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../p_arms.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
+#include "ObjManager.h"
+#include "misc.h"
+#include "game.h"
+#include "p_arms.h"
+#include "SoundManager.h"
+#include "ai.h"
 #include "weapons.h"
 
 // how far away the area-of-effect slashes are spawned when

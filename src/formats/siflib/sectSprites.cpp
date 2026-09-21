@@ -1,7 +1,7 @@
 #include "sectSprites.h"
 
-#include "../common/bufio.h"
-#include "../Utils/Logger.h"
+#include "bufio.h"
+#include "Logger.h"
 
 #include <cstdlib>
 #include <cstring>

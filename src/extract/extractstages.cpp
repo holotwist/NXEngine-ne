@@ -1,8 +1,8 @@
 
 #include "extractstages.h"
 
-#include "../maprecord.h"
-#include "../stagedata.h"
+#include "maprecord.h"
+#include "stagedata.h"
 
 #include <cstdint>
 #include <cstdio>

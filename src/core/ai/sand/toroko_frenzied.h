@@ -1,6 +1,6 @@
 #ifndef __AITOROKO_H_
 #define __AITOROKO_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_toroko_frenzied(Object *o);
 void ai_toroko_block(Object *o);

@@ -5,11 +5,11 @@
 
 #include "caret.h"
 
-#include "autogen/sprites.h"
-#include "common/llist.h"
-#include "common/misc.h"
-#include "Utils/Logger.h"
-#include "graphics/Renderer.h"
+#include "sprites.h"
+#include "llist.h"
+#include "misc.h"
+#include "Logger.h"
+#include "Renderer.h"
 #include "map.h"
 #include "nx.h"
 #include "trig.h"

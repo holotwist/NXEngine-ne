@@ -3,12 +3,12 @@
 // and island-looks-like-it-gonna-crash but it's ok from secret ending
 #include "island.h"
 
-#include "../autogen/sprites.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../nx.h"
-#include "../player.h"
-#include "../statusbar.h"
+#include "sprites.h"
+#include "game.h"
+#include "Renderer.h"
+#include "nx.h"
+#include "player.h"
+#include "statusbar.h"
 using namespace NXE::Graphics;
 
 static struct

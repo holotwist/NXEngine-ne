@@ -3,7 +3,7 @@
 
 #include "ObjManager.h"
 #include "game.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "nx.h"
 #include "settings.h"
 #include "statusbar.h"
@@ -11,21 +11,21 @@
 
 using namespace NXE::Graphics;
 
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "debug.h"
 #include "map.h"
 #include "p_arms.h"
 #include "player.h"
 #include "playerstats.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 
 #include <cstdarg>
 #include <string>
 #include <vector>
 #include <cstring>
 
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "player.h"
 
 #define Respond console.Print
@@ -521,11 +521,8 @@ static void __reset(std::vector<std::string> *args, int num)
 
 static void __fps(std::vector<std::string> *args, int num)
 {
-  extern int fps;
-
   settings->show_fps ^= 1;
   settings_save();
-  fps = 0;
 }
 
 /*

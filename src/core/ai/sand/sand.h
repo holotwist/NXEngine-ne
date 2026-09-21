@@ -1,6 +1,6 @@
 #ifndef __AISAND_H_
 #define __AISAND_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_polish(Object *o);
 void ondeath_polish(Object *o);

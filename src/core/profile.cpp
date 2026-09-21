@@ -1,8 +1,8 @@
 #include "profile.h"
 
-#include "common/misc.h"
-#include "utils/Logger.h"
-#include "platform/ResourceManager.h"
+#include "misc.h"
+#include "Logger.h"
+#include "ResourceManager.h"
 #include "nx.h"
 #include "tsc.h"
 

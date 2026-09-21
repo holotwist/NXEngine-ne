@@ -1,7 +1,7 @@
 
 #ifndef _SCREENEFFECT_H
 #define _SCREENEFFECT_H
-#include "autogen/sprites.h"
+#include "sprites.h"
 
 // screeneffects are a simple draw overlay used w/ things such as flashes and such.
 class ScreenEffect

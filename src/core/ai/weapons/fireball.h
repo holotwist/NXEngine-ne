@@ -1,6 +1,6 @@
 #ifndef __AIFIREBALL_H_
 #define __AIFIREBALL_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_fireball(Object *o);
 void ai_fireball_level_23(Object *o);

@@ -7,7 +7,7 @@
 
 #include "ItemImage.h"
 
-#include "../graphics/Renderer.h"
+#include "Renderer.h"
 using namespace NXE::Graphics;
 #include "TextBox.h"
 

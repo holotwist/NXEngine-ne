@@ -1,16 +1,16 @@
 #include "oside.h"
 
-#include "../../autogen/sprites.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../sand/sand.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "sprites.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "sand/sand.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 using namespace NXE::Graphics;
 

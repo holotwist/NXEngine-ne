@@ -1,6 +1,6 @@
 #ifndef __AIPUPPY_H_
 #define __AIPUPPY_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_puppy_wag(Object *o);
 void ai_puppy_bark(Object *o);

@@ -2,19 +2,19 @@
 #include "debug.h"
 
 #include "game.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "input.h"
 #include "nx.h"
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "console.h"
 #include "map.h"
 #include "object.h"
 #include "player.h"
 #include "playerstats.h"
 #include "settings.h"
-#include "siflib/sif.h"
-#include "sound/SoundManager.h"
+#include "sif.h"
+#include "SoundManager.h"
 
 #include <cstring>
 #include <stdarg.h>
@@ -223,7 +223,7 @@ void debug_clear()
 void c------------------------------() {}
 */
 
-#include "autogen/objnames.h"
+#include "objnames.h"
 
 // given an object type returns the name of the object e.g. "OBJ_TOROKO"
 const char *DescribeObjectType(int type)

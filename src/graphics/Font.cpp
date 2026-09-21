@@ -1,10 +1,10 @@
 #include "Font.h"
 #include "Renderer.h"
-#include "platform/ResourceManager.h"
+#include "ResourceManager.h"
 #include "core/common/misc.h"
-#include "core/utils/Logger.h"
+#include "Logger.h"
 #include "core/game.h"
-#include "autogen/sprites.h"
+#include "sprites.h"
 
 #include <json.hpp>
 #include <utf8.h>
@@ -132,7 +132,7 @@ uint32_t Font::drawLTR(int x, int y, const std::string &text, uint32_t color, bo
     if (_rendering)
     {
       if (isShaded)
-        DrawTextEx(_rayFont, text.c_str(), Vector2{(float)x + 1, (float)y + 1}, 16.0f, 0.0f, ::BLACK);
+        DrawTextEx(_rayFont, text.c_str(), Vector2{(float)x + 1, (float)y + 1}, 16.0f, 0.0f, Color{0, 0, 0, 255});
       DrawTextEx(_rayFont, text.c_str(), Vector2{(float)x, (float)y}, 16.0f, 0.0f, c);
     }
     return (uint32_t)MeasureTextEx(_rayFont, text.c_str(), 16.0f, 0.0f).x;
@@ -166,7 +166,7 @@ uint32_t Font::drawLTR(int x, int y, const std::string &text, uint32_t color, bo
       if (isShaded)
       {
         Rectangle dstShd{(float)(x + g.xoffset + 1), (float)(y + g.yoffset + 1), (float)g.w, (float)g.h};
-        DrawTexturePro(atlas, src, dstShd, Vector2{0, 0}, 0.0f, ::BLACK);
+        DrawTexturePro(atlas, src, dstShd, Vector2{0, 0}, 0.0f, Color{0, 0, 0, 255});
       }
       Rectangle dst{(float)(x + g.xoffset), (float)(y + g.yoffset), (float)g.w, (float)g.h};
       DrawTexturePro(atlas, src, dst, Vector2{0, 0}, 0.0f, c);

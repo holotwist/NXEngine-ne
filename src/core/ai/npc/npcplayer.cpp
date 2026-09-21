@@ -1,16 +1,16 @@
 #include "npcplayer.h"
 
-#include "../../autogen/sprites.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Tileset.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../tsc.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "sprites.h"
+#include "misc.h"
+#include "game.h"
+#include "Tileset.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "tsc.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 /*
         This is an object which looks exactly like the player,

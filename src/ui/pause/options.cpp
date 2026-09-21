@@ -1,16 +1,16 @@
 #include "options.h"
 
-#include "../nx.h"
+#include "nx.h"
 #include "dialog.h"
 #include "message.h"
-#include "../ResourceManager.h"
-#include "../common/misc.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../map.h"
-#include "../settings.h"
-#include "../sound/SoundManager.h"
+#include "ResourceManager.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "input.h"
+#include "map.h"
+#include "settings.h"
+#include "SoundManager.h"
 using namespace Options;
 using namespace NXE::Graphics;
 

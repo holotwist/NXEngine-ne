@@ -1,6 +1,6 @@
 #ifndef __AIFINMISERY_H_
 #define __AIFINMISERY_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_boss_misery(Object *o);
 static void run_spells(Object *o);

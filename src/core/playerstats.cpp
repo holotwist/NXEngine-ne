@@ -2,12 +2,12 @@
 #include "playerstats.h"
 
 #include "caret.h"
-#include "Utils/Logger.h"
+#include "Logger.h"
 #include "game.h"
 #include "inventory.h"
 #include "nx.h"
 #include "player.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "statusbar.h"
 
 void AddHealth(int hp)

@@ -8,7 +8,8 @@
 // all the function pointers etc for the various creatures.
 #include "InitList.h"
 
-#include "../Utils/Logger.h"
+#include "Logger.h"
+#include <cstdint>
 
 void InitList::AddFunction(void (*func)(void))
 {

@@ -9,7 +9,7 @@
 #define CONSOLE_MAX_BACK 8
 #include <string>
 #include <vector>
-#include <spdlog/fmt/fmt.h>
+#include "Logger.h"
 
 struct CommandEntry
 {
@@ -35,7 +35,7 @@ public:
 
   template<typename... Args> void Print(const std::string& format, Args... args)
   {
-    fResponse.push_back(fmt::format(format, args...));
+    fResponse.push_back(NXE::Utils::Logger::format(format, args...));
     fResponseTimer = 60;
   }
 

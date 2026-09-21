@@ -2,7 +2,7 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
 
-#include "../input.h"
+#include "input.h"
 #include "options.h"
 
 #include <string>

@@ -1,6 +1,6 @@
 #ifndef __AISIDEKICKS_H_
 #define __AISIDEKICKS_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_misery_frenzied(Object *o);
 static Object *fm_spawn_missile(Object *o, int angindex);

@@ -1,6 +1,6 @@
 #ifndef __AIBALLOSPRIEST_H_
 #define __AIBALLOSPRIEST_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_ballos_priest(Object *o);
 // static void run_flight(Object *o);

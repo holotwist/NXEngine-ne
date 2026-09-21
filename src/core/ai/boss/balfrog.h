@@ -1,9 +1,9 @@
 
 #ifndef _BALFROG_H
 #define _BALFROG_H
-#include "../../object.h"
-#include "../../stageboss.h"
-#include "../IrregularBBox.h"
+#include "object.h"
+#include "stageboss.h"
+#include "IrregularBBox.h"
 
 class BalfrogBoss : public StageBoss
 {

@@ -10,7 +10,7 @@
 #include "ai/boss/sisters.h"
 #include "ai/boss/undead_core.h"
 #include "ai/boss/x.h"
-#include "Utils/Logger.h"
+#include "Logger.h"
 #include "game.h"
 #include "nx.h"
 

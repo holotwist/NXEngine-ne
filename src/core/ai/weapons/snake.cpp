@@ -1,9 +1,9 @@
 #include "snake.h"
 
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../object.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "object.h"
 #include "fireball.h"
 #include "weapons.h"
 

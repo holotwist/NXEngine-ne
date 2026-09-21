@@ -1,6 +1,6 @@
 #ifndef __AIFINMISC_H_
 #define __AIFINMISC_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_doctor_ghost(Object *o);
 void ai_red_energy(Object *o);

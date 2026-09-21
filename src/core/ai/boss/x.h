@@ -1,8 +1,8 @@
 
 #ifndef _XBOSS_H
 #define _XBOSS_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 enum XBDir
 {

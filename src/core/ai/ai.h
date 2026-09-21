@@ -1,7 +1,7 @@
 
 #ifndef _AI_H
 #define _AI_H
-#include "../object.h"
+#include "object.h"
 
 void randblink(Object *o, int blinkframe = 1, int blinktime = 8, int prob = 120);
 

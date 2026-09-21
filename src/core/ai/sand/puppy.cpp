@@ -1,12 +1,12 @@
 #include "puppy.h"
 
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
 
 INITFUNC(AIRoutines)
 {

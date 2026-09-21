@@ -14,7 +14,7 @@
 #define PATH_MAX 259
 #endif
 
-#include "../Utils/Logger.h"
+#include "Logger.h"
 
 #define ASSERT(X)                                                                                                      \
   {                                                                                                                    \

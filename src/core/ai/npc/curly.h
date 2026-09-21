@@ -1,6 +1,6 @@
 #ifndef __AICURLY_H_
 #define __AICURLY_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_curly(Object *o);
 void ai_curly_collapsed(Object *o);

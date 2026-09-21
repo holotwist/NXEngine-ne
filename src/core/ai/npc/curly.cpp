@@ -1,13 +1,13 @@
 #include "curly.h"
 
-#include "../../ObjManager.h"
-#include "../../game.h"
-#include "../../map.h"
-#include "../../p_arms.h"
-#include "../../player.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "game.h"
+#include "map.h"
+#include "p_arms.h"
+#include "player.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 #define CURLY_STAND 0
 #define CURLY_WALK 3

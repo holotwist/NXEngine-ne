@@ -1,16 +1,16 @@
 
 #include "pause.h"
 
-#include "../autogen/sprites.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../nx.h"
-#include "../screeneffect.h"
-#include "../endgame/credits.h"
-#include "../endgame/island.h"
-#include "../inventory.h"
-#include "../map_system.h"
+#include "sprites.h"
+#include "game.h"
+#include "Renderer.h"
+#include "input.h"
+#include "nx.h"
+#include "screeneffect.h"
+#include "credits.h"
+#include "island.h"
+#include "inventory.h"
+#include "map_system.h"
 using namespace NXE::Graphics;
 #include "dialog.h"
 using namespace Options;

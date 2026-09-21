@@ -1,8 +1,8 @@
 #include "balrog_common.h"
 
-#include "../game.h"
-#include "../player.h"
-#include "../sound/SoundManager.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
 #include "ai.h"
 #include "stdai.h"
 

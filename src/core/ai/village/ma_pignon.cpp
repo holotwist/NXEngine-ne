@@ -1,15 +1,15 @@
 #include "ma_pignon.h"
 
-#include "../../ObjManager.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Tileset.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
+#include "ObjManager.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "Tileset.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
 
 enum
 {

@@ -6,17 +6,16 @@
 #ifndef _PIXTONE_H
 #define _PIXTONE_H
 
-#include "../Singleton.h"
-#include "../common/basics.h"
+#include "Singleton.h"
+#include "basics.h"
 #include "SoundManager.h"
-
-#include <SDL_mixer.h>
 #include <string>
+#include <vector>
+#include <cstdint>
 
 #define PXT_NO_CHANNELS 4
 #define PXENV_NUM_VERTICES 3
-
-#define NUM_RESAMPLED_BUFFERS 16
+#define MAX_PXT_VOICES 32
 
 namespace NXE
 {
@@ -35,7 +34,7 @@ enum
   PXT_NO_MODELS
 };
 
-typedef struct
+struct stPXEnvelope
 {
   int32_t initial;
   struct
@@ -43,9 +42,9 @@ typedef struct
     int32_t time, val;
   } p[PXENV_NUM_VERTICES];
   int32_t evaluate(int32_t i) const;
-} stPXEnvelope;
+};
 
-typedef struct
+struct stPXChannel
 {
   bool enabled;
   uint32_t nsamples;
@@ -62,9 +61,9 @@ typedef struct
   stPXEnvelope envelope;
   int8_t *buffer;
   void synth();
-} stPXChannel;
+};
 
-typedef struct
+struct stPXSound
 {
   stPXChannel channels[PXT_NO_CHANNELS];
 
@@ -74,7 +73,16 @@ typedef struct
   bool render();
   int32_t allocBuf();
   void freeBuf();
-} stPXSound;
+};
+
+struct PxtVoice
+{
+  int slot = -1;
+  float pos = 0.0f;
+  float step = 1.0f;
+  int loop = 0;
+  bool active = false;
+};
 
 class Pixtone
 {
@@ -83,12 +91,10 @@ public:
   bool init();
   void shutdown();
 
-  int play(int32_t chan, int32_t slot, int32_t loop);
-  int playResampled(int32_t chan, int32_t slot, int32_t loop, uint32_t percent);
-  int prepareResampled(int32_t slot, uint32_t percent);
+  void play(int32_t slot, int32_t loop = 0);
+  void playResampled(int32_t slot, uint32_t percent);
   void stop(int32_t slot);
-
-  void pxtSoundDone(int channel);
+  void mixActiveChannels(int16_t *stream, uint32_t frameCount);
 
 protected:
   friend class Singleton<Pixtone>;
@@ -100,15 +106,10 @@ protected:
 
 private:
   void _prepareToPlay(stPXSound *snd, int32_t slot);
+
   bool _inited = false;
-  struct
-  {
-    Mix_Chunk *chunk         = NULL;
-    Mix_Chunk *resampled[NUM_RESAMPLED_BUFFERS] = {NULL};
-    uint32_t resampled_rate[NUM_RESAMPLED_BUFFERS]  = {SAMPLE_RATE};
-    int32_t channel          = -1;
-  } _sound_fx[256];
-  int32_t _slots[64];
+  std::vector<int16_t> _sounds[256];
+  PxtVoice _voices[MAX_PXT_VOICES];
   const uint32_t NUM_SOUNDS = 0x75;
 };
 

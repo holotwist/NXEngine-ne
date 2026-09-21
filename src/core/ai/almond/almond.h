@@ -1,7 +1,7 @@
 
 #ifndef _ALMOND_H
 #define _ALMOND_H
-#include "../../object.h"
+#include "object.h"
 
 // states to control the water-level object
 #define WL_CALM 10 // calm and slow at set point

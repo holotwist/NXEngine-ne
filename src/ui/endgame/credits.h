@@ -4,7 +4,7 @@
 
 #define MAX_BIGIMAGES 20
 #define CRED_MAX_TEXT 80
-#include "../graphics/Surface.h"
+#include "Surface.h"
 #include "CredReader.h"
 
 #include <vector>

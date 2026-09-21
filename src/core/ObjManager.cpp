@@ -1,10 +1,10 @@
 
 #include "ObjManager.h"
 
-#include "autogen/sprites.h"
-#include "common/llist.h"
+#include "sprites.h"
+#include "llist.h"
 #include "game.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "map.h"
 #include "nx.h"
 #include "object.h"

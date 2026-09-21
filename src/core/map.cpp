@@ -3,17 +3,17 @@
 
 #include "ObjManager.h"
 #include "ai/sym/smoke.h"
-#include "autogen/sprites.h"
+#include "sprites.h"
 #include "caret.h"
 #include "debug.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "nx.h"
 #include "tsc.h"
 using namespace NXE::Graphics;
 
 #include "ResourceManager.h"
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "game.h"
 #include "player.h"
 #include "settings.h"

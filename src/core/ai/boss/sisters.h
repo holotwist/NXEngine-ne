@@ -1,8 +1,8 @@
 
 #ifndef _SISTERS_H
 #define _SISTERS_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 // although you will need to add additional copies of the head sprites
 // for it to work properly, just try setting this number to something

@@ -1,8 +1,8 @@
 
 #ifndef _IRONHEAD_H
 #define _IRONHEAD_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 class IronheadBoss : public StageBoss
 {

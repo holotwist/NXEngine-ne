@@ -1,8 +1,8 @@
 
 #ifndef _BALLOS_H
 #define _BALLOS_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 #define NUM_EYES 2
 enum TRIGDIR

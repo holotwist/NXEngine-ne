@@ -1,8 +1,8 @@
 
 #ifndef _COREBOSS_H
 #define _COREBOSS_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 class CoreBoss : public StageBoss
 {

@@ -1,14 +1,14 @@
 
 #include "message.h"
 
-#include "../graphics/Renderer.h"
-#include "../nx.h"
+#include "Renderer.h"
+#include "nx.h"
 
 #include <vector>
 using namespace NXE::Graphics;
-#include "../TextBox/TextBox.h"
-#include "../game.h"
-#include "../input.h"
+#include "TextBox.h"
+#include "game.h"
+#include "input.h"
 
 using namespace Options;
 extern std::vector<void *> optionstack;

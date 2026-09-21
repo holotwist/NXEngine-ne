@@ -17,8 +17,8 @@
 #endif
 
 #include "ResourceManager.h"
-#include "common/glob.h"
-#include "common/misc.h"
+#include "glob.h"
+#include "misc.h"
 #include "settings.h"
 
 #include <json.hpp>

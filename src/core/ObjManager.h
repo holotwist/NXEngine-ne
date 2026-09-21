@@ -2,7 +2,7 @@
 #ifndef _OBJMANAGER_H
 #define _OBJMANAGER_H
 #include "object.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 
 namespace Objects
 {

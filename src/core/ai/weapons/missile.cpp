@@ -1,13 +1,13 @@
 #include "missile.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "trig.h"
 #include "weapons.h"
 
 #define STATE_WAIT_RECOIL_OVER 1

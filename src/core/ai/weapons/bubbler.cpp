@@ -1,13 +1,13 @@
 #include "bubbler.h"
 
-#include "../../ObjManager.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../input.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
+#include "ObjManager.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "input.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
 #include "weapons.h"
 
 INITFUNC(AIRoutines)

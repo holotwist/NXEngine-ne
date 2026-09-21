@@ -3,13 +3,13 @@
 // It runs the little "mascots" that come on the screen after a while in the options menu.
 #include "objects.h"
 
-#include "../ai/ai.h"
-#include "../autogen/sprites.h"
-#include "../common/llist.h"
-#include "../common/misc.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../nx.h"
+#include "ai/ai.h"
+#include "sprites.h"
+#include "llist.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "nx.h"
 #include "options.h"
 using namespace NXE::Graphics;
 

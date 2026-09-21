@@ -1,7 +1,7 @@
 
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
-#include "../object.h"
+#include "object.h"
 
 namespace Options
 {

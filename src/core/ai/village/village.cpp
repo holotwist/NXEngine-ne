@@ -1,13 +1,13 @@
 #include "village.h"
 
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Tileset.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../weed/weed.h"
+#include "misc.h"
+#include "game.h"
+#include "Tileset.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
+#include "weed/weed.h"
 
 INITFUNC(AIRoutines)
 {

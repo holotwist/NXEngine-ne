@@ -1,6 +1,6 @@
 #ifndef _DOCTOR_H
 #define _DOCTOR_H
-#include "../../object.h"
+#include "object.h"
 
 extern int crystal_xmark, crystal_ymark;
 extern bool crystal_tofront;

@@ -1,6 +1,6 @@
 #ifndef __AISYM_H_
 #define __AISYM_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_null(Object *o);
 void ai_hvtrigger(Object *o);

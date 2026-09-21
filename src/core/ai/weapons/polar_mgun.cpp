@@ -1,9 +1,9 @@
 #include "polar_mgun.h"
 
-#include "../../ObjManager.h"
-#include "../../game.h"
-#include "../../p_arms.h"
-#include "../../sound/SoundManager.h"
+#include "ObjManager.h"
+#include "game.h"
+#include "p_arms.h"
+#include "SoundManager.h"
 #include "weapons.h"
 
 // code for both Polar Star _AND_ MGun. The way I handle trails on level 2 & 3 mgun shots

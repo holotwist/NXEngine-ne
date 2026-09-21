@@ -1,12 +1,12 @@
 #include "final_misc.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../ai.h"
-#include "../stdai.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "ai.h"
+#include "stdai.h"
 
 INITFUNC(AIRoutines)
 {

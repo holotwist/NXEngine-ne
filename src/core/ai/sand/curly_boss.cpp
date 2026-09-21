@@ -1,15 +1,15 @@
 #include "curly_boss.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../weapons/weapons.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
+#include "weapons/weapons.h"
 
 #define CURLYB_FIGHT_START 10
 #define CURLYB_WAIT 11

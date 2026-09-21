@@ -6,15 +6,15 @@
 
 #include "StageSelect.h"
 
-#include "../Utils/Logger.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../nx.h"
-#include "../sound/SoundManager.h"
-#include "../tsc.h"
+#include "Logger.h"
+#include "game.h"
+#include "Renderer.h"
+#include "input.h"
+#include "nx.h"
+#include "SoundManager.h"
+#include "tsc.h"
 using namespace NXE::Graphics;
-#include "../autogen/sprites.h"
+#include "sprites.h"
 
 #define WARP_X (Renderer::getInstance()->screenWidth / 2) - 32
 #define WARP_Y (Renderer::getInstance()->screenHeight / 2) - 74

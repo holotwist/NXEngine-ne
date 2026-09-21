@@ -2,7 +2,7 @@
 #ifndef _INVENTORY_H
 #define _INVENTORY_H
 
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 
 #define MAXLISTLEN 100
 

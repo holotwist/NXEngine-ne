@@ -1,14 +1,14 @@
 #include "weapons.h"
 
-#include "../../ObjManager.h"
-#include "../../caret.h"
-#include "../../Utils/Logger.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "caret.h"
+#include "Logger.h"
+#include "game.h"
+#include "Renderer.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "sym/smoke.h"
 
 using namespace NXE::Graphics;
 

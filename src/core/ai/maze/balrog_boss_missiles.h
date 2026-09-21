@@ -1,6 +1,6 @@
 #ifndef __AIBALROGMISS_H_
 #define __AIBALROGMISS_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_balrog_boss_missiles(Object *o);
 void ondeath_balrog_boss_missiles(Object *o);

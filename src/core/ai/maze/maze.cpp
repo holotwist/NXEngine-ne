@@ -1,11 +1,11 @@
 #include "maze.h"
 
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 INITFUNC(AIRoutines)
 {

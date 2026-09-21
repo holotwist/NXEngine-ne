@@ -3,31 +3,31 @@
 
 #include "ObjManager.h"
 #include "ai/ai.h"
-#include "Utils/Logger.h"
+#include "Logger.h"
 #include "console.h"
 #include "debug.h"
-#include "endgame/credits.h"
-#include "endgame/island.h"
-#include "graphics/Renderer.h"
-#include "intro/intro.h"
-#include "intro/title.h"
+#include "credits.h"
+#include "island.h"
+#include "Renderer.h"
+#include "intro.h"
+#include "title.h"
 #include "inventory.h"
 #include "map.h"
 #include "map_system.h"
 #include "nx.h"
-#include "pause/options.h"
-#include "pause/pause.h"
-#include "pause/mods.h"
+#include "options.h"
+#include "pause.h"
+#include "mods.h"
 #include "player.h"
 #include "profile.h"
 #include "settings.h"
 #include "slope.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "statusbar.h"
 #include "tsc.h"
 using namespace NXE::Graphics;
-#include "autogen/AssignSprites.h"
-#include "autogen/sprites.h"
+#include "AssignSprites.h"
+#include "sprites.h"
 #include "caret.h"
 #include "screeneffect.h"
 
@@ -349,10 +349,11 @@ void megaquake(int quaketime, NXE::Sound::SFX snd)
   rumble(0.8, quaketime * 10);
 }
 
+int flipacceltime = 0;
+
 void DrawScene(void)
 {
   int scr_x, scr_y;
-  extern int flipacceltime;
   Renderer::getInstance()->clearScreen(BLACK);
 
   // draw background map tiles
@@ -610,10 +611,10 @@ bool game_load(int num)
   char *profile_name = GetProfileName(num);
   if (profile_load(profile_name, &p))
   {
-    SDL_free(profile_name);
+    free(profile_name);
     return 1;
   }
-  SDL_free(profile_name);
+  free(profile_name);
 
   return game_load(&p);
 }
@@ -687,11 +688,11 @@ bool game_save(int num)
   char *profile_name = GetProfileName(num);
   if (profile_save(profile_name, &p))
   {
-    SDL_free(profile_name);
+    free(profile_name);
     return 1;
   }
 
-  SDL_free(profile_name);
+  free(profile_name);
 
   return 0;
 }

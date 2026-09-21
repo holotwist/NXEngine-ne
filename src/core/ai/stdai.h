@@ -2,9 +2,9 @@
 #ifndef _STDAI_H
 #define _STDAI_H
 
-#include "../common/InitList.h"
-#include "../nx.h"
-#include "../object.h"
+#include "InitList.h"
+#include "nx.h"
+#include "object.h"
 
 extern InitList AIRoutines;
 

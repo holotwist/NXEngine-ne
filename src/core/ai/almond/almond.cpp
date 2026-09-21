@@ -1,13 +1,13 @@
 
 #include "almond.h"
 
-#include "../../Utils/Logger.h"
-#include "../../game.h"
-#include "../../map.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "Logger.h"
+#include "game.h"
+#include "map.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 INITFUNC(AIRoutines)
 {

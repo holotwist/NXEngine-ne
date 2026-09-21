@@ -1,8 +1,8 @@
 #ifndef _UNDEADCORE_BOSS_H
 #define _UNDEADCORE_BOSS_H
 
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 #define NUM_ROTATORS 4
 enum BBoxes

@@ -1,6 +1,6 @@
 #ifndef __AIGAUDI_H_
 #define __AIGAUDI_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_gaudi(Object *o);
 void ai_gaudi_dying(Object *o);

@@ -1,8 +1,8 @@
 #include "translate.h"
 
-#include "../ResourceManager.h"
-#include "../common/misc.h"
-#include "../Utils/Logger.h"
+#include "ResourceManager.h"
+#include "misc.h"
+#include "Logger.h"
 #include "minibidi.h"
 
 #include <json.hpp>

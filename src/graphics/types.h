@@ -4,6 +4,29 @@
 #include <cstdint>
 #include <raylib.h>
 
+// Undefine Raylib color macros that collide with NXEngine constants
+#ifdef BLACK
+#undef BLACK
+#endif
+#ifdef WHITE
+#undef WHITE
+#endif
+#ifdef RED
+#undef RED
+#endif
+#ifdef GREEN
+#undef GREEN
+#endif
+#ifdef BLUE
+#undef BLUE
+#endif
+#ifdef YELLOW
+#undef YELLOW
+#endif
+#ifdef MAGENTA
+#undef MAGENTA
+#endif
+
 struct NXColor
 {
   uint8_t r, g, b;

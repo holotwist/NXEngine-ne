@@ -1,14 +1,14 @@
 #include "balrog_boss_missiles.h"
 
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../balrog_common.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "balrog_common.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 #define STATE_CHARGE 10
 #define STATE_JUMP_FIRE 20

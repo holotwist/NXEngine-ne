@@ -1,7 +1,7 @@
 #include "sectStringArray.h"
 
-#include "../common/bufio.h"
-#include "../Utils/Logger.h"
+#include "bufio.h"
+#include "Logger.h"
 
 // decode the raw section data into the given tringList object
 bool SIFStringArraySect::Decode(const uint8_t *data, int datalen, std::vector<std::string> *out)

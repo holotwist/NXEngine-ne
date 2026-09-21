@@ -1,12 +1,12 @@
 #include "first_cave.h"
 
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../ai.h"
-#include "../sand/puppy.h"
-#include "../stdai.h"
-#include "../weed/weed.h" // for ai_critter
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "ai.h"
+#include "sand/puppy.h"
+#include "stdai.h"
+#include "weed/weed.h" // for ai_critter
 
 INITFUNC(AIRoutines)
 {

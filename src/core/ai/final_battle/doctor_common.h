@@ -1,6 +1,6 @@
 #ifndef __AIDOCTORCOM_H_
 #define __AIDOCTORCOM_H_
-#include "../../object.h"
+#include "object.h"
 
 Object *dr_create_red_crystal(int x, int y);
 void dr_tp_out_init(Object *o);

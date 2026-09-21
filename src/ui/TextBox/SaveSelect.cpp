@@ -5,21 +5,21 @@
 
 #include "SaveSelect.h"
 
-#include "../autogen/sprites.h"
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../inventory.h"
-#include "../map.h"
-#include "../nx.h"
-#include "../player.h"
-#include "../playerstats.h"
-#include "../profile.h"
-#include "../settings.h"
-#include "../statusbar.h"
-#include "../tsc.h"
+#include "sprites.h"
+#include "game.h"
+#include "Renderer.h"
+#include "input.h"
+#include "inventory.h"
+#include "map.h"
+#include "nx.h"
+#include "player.h"
+#include "playerstats.h"
+#include "profile.h"
+#include "settings.h"
+#include "statusbar.h"
+#include "tsc.h"
 #include "TextBox.h" // for textbox coordinates; MSG_W etc
-#include "../sound/SoundManager.h"
+#include "SoundManager.h"
 
 using namespace NXE::Graphics;
 
@@ -95,7 +95,7 @@ void TB_SaveSelect::SetVisible(bool enable, bool saving)
     char *profile_name = GetProfileName(i);
     if (!profile_load(profile_name, &fProfiles[i]))
       fHaveProfile[i] = true;
-    SDL_free(profile_name);
+    free(profile_name);
   }
 
   textbox.ClearText();

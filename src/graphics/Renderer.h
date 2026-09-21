@@ -79,14 +79,6 @@ public:
   void fillRect(int x1, int y1, int x2, int y2, NXColor color);
   void fillRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b);
   void fillRect(NXRect *rect, uint8_t r, uint8_t g, uint8_t b);
-  void fillRect(NXRect *rect, NXColor color);void drawRect(int x1, int y1, int x2, int y2, NXColor color);
-  void drawRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b);
-  void drawRect(NXRect *rect, uint8_t r, uint8_t g, uint8_t b);
-  void drawRect(NXRect *rect, NXColor color);
-
-  void fillRect(int x1, int y1, int x2, int y2, NXColor color);
-  void fillRect(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b);
-  void fillRect(NXRect *rect, uint8_t r, uint8_t g, uint8_t b);
   void fillRect(NXRect *rect, NXColor color);
 
   void drawPixel(int x, int y, NXColor color);

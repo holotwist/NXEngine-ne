@@ -3,14 +3,14 @@
 
 #include "inventory.h"
 
-#include "autogen/sprites.h"
-#include "graphics/Renderer.h"
+#include "sprites.h"
+#include "Renderer.h"
 #include "nx.h"
 #include "game.h"
 #include "input.h"
 #include "p_arms.h"
 #include "player.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "statusbar.h"
 #include "tsc.h"
 

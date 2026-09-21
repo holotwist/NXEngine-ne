@@ -1,8 +1,8 @@
 
 #ifndef _HEAVYPRESS_H
 #define _HEAVYPRESS_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 class HeavyPress : public StageBoss
 {

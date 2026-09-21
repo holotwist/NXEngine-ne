@@ -2,7 +2,7 @@
 #include "trig.h"
 
 #include "ai/ai.h"
-#include "common/misc.h"
+#include "misc.h"
 #include "nx.h"
 #include "player.h"
 

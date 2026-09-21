@@ -4,25 +4,28 @@
 /* https://bisqwit.iki.fi/jutut/kuvat/programming_examples/doukutsu-org/orgplay.cc */
 
 #include "Organya.h"
-
-#include "../ResourceManager.h"
-#include "../common/glob.h"
-#include "../common/misc.h"
-#include "../Utils/Logger.h"
-#include "../Utils/Common.h"
-#include "../settings.h"
+#include "ResourceManager.h"
+#include "glob.h"
+#include "misc.h"
+#include "Logger.h"
+#include "Common.h"
+#include "settings.h"
 #include "Pixtone.h"
 #include "SoundManager.h"
 
-#include <SDL.h>
-#include <SDL_mixer.h>
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <fstream>
-#include <functional>
 #include <iostream>
-#include <stdexcept>
 #include <string>
+
+static uint32_t get_time_ms()
+{
+  return (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(
+    std::chrono::steady_clock::now().time_since_epoch()
+  ).count();
+}
 
 //------------------------------------------------------------------------------
 
@@ -173,7 +176,7 @@ void Song::Synth()
 
   // Begin synthesis
 
-  last_gen_tick = SDL_GetTicks();
+  last_gen_tick = get_time_ms();
   last_gen_beat = cur_beat;
 
   if (cur_beat == loop_end)
@@ -322,41 +325,25 @@ bool Organya::load(const std::string &fname)
   return true;
 }
 
-std::function<void(void *, uint8_t *, int)> musicCallback;
-
-void myMusicPlayer(void *udata, uint8_t *stream, int len)
+void Organya::renderAudio(int16_t *stream, uint32_t frameCount)
 {
-  musicCallback(udata, stream, len);
-}
-
-void Organya::_musicCallback(void *udata, uint8_t *stream, uint32_t len)
-{
-  SDL_memset(stream, 0, len);
-  if (!song.playing)
-    return;
-  int16_t *str = reinterpret_cast<int16_t *>(stream);
+  if (!song.playing) return;
 
   uint32_t idx = song.last_pos;
-  for (uint32_t i = 0; i < len / 2; i++)
+  float vol = volume * ((float)settings->music_volume / 100.0f);
+  uint32_t sampleCount = frameCount * 2;
+
+  for (uint32_t i = 0; i < sampleCount; i++)
   {
     if (idx >= song.samples.size())
     {
       song.Synth();
       idx = 0;
     }
-    // extended range
-    int32_t sample = song.samples[idx] * 32767.0 * volume * (double)(settings->music_volume / 100.);
-    // clip to int16
-    if (sample > 32767)
-    {
-      sample = 32767;
-    }
-    if (sample < -32768)
-    {
-      sample = -32768;
-    }
 
-    str[i] = (int16_t)sample;
+    int32_t sample = (int32_t)(song.samples[idx] * 32767.0f * vol);
+    int32_t mixed = stream[i] + sample;
+    stream[i] = (int16_t)clamp(mixed, -32768, 32767);
     idx++;
   }
 
@@ -370,12 +357,9 @@ bool Organya::start(int startBeat)
 
   song.playing = true;
   fading       = false;
-  volume       = 0.75;
-  musicCallback
-      = std::bind(&Organya::_musicCallback, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+  volume       = 0.75f;
   _setPlayPosition(startBeat);
   song.Synth();
-  Mix_HookMusic(myMusicPlayer, NULL);
   return true;
 }
 
@@ -383,12 +367,7 @@ uint32_t Organya::stop()
 {
   if (song.playing)
   {
-    /* Okay, this is hackish, and still misses a beat or two.
-       Sadly, there's no better way on SDL, because it writes
-       to audio device in bulk and there's no way of knowing
-       how many samples actually played.
-    */
-    uint32_t delta    = SDL_GetTicks() - song.last_gen_tick;
+    uint32_t delta    = get_time_ms() - song.last_gen_tick;
     uint32_t beats    = (double)delta / (double)song.ms_per_beat;
     uint32_t cur_beat = song.last_gen_beat + beats;
     if (cur_beat >= song.loop_end)
@@ -397,7 +376,6 @@ uint32_t Organya::stop()
     }
 
     song.playing = false;
-    Mix_HookMusic(NULL, NULL);
     return cur_beat;
   }
   return 0;
@@ -433,7 +411,7 @@ void Organya::runFade()
 {
   if (!fading)
     return;
-  uint32_t curtime = SDL_GetTicks();
+  uint32_t curtime = get_time_ms();
 
   if ((curtime - last_fade_time) >= 25)
   {

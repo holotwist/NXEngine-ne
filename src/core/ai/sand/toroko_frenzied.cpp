@@ -1,15 +1,15 @@
 #include "toroko_frenzied.h"
 
-#include "../../ObjManager.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "trig.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 INITFUNC(AIRoutines)
 {

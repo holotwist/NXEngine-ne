@@ -1,20 +1,20 @@
 #include "npcregu.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../common/misc.h"
-#include "../../Utils/Logger.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../final_battle/doctor.h"
-#include "../final_battle/doctor_common.h" //for Sue redcrystal
-#include "../sand/puppy.h"                 // for ZZZZ
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "misc.h"
+#include "Logger.h"
+#include "game.h"
+#include "Renderer.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "final_battle/doctor.h"
+#include "final_battle/doctor_common.h" //for Sue redcrystal
+#include "sand/puppy.h"                 // for ZZZZ
+#include "stdai.h"
+#include "sym/smoke.h"
 
 using namespace NXE::Graphics;
 

@@ -1,8 +1,9 @@
 #include "Renderer.h"
 #include "core/object.h"
-#include "core/utils/Logger.h"
-#include "platform/ResourceManager.h"
+#include "Logger.h"
+#include "ResourceManager.h"
 #include "core/version.h"
+#include "nx.h"
 #include <cmath>
 #include <algorithm>
 
@@ -50,6 +51,7 @@ bool Renderer::init(int resolution)
   SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
   InitWindow(res[_currentRes].width, res[_currentRes].height, NXVERSION);
   SetWindowMinSize(320, 240);
+  SetTargetFPS(50); // Standard freq ticks
 
   _target = LoadRenderTexture(screenWidth, screenHeight);
   SetTextureFilter(_target.texture, TEXTURE_FILTER_POINT);
@@ -171,7 +173,7 @@ void Renderer::endFrame()
 void Renderer::flip()
 {
   BeginDrawing();
-  ClearBackground(::BLACK);
+  ClearBackground(Color{0, 0, 0, 255});
 
   // Pillarbox/letterbox target presentation
   float scaleFactor = std::min((float)GetScreenWidth() / (float)screenWidth,
@@ -185,7 +187,7 @@ void Renderer::flip()
     (float)screenHeight * scaleFactor
   };
 
-  DrawTexturePro(_target.texture, src, dst, Vector2{0.0f, 0.0f}, 0.0f, ::WHITE);
+  DrawTexturePro(_target.texture, src, dst, Vector2{0.0f, 0.0f}, 0.0f, Color{255, 255, 255, 255});
   EndDrawing();
 }
 
@@ -195,7 +197,7 @@ void Renderer::drawSurface(Surface *src, int dstx, int dsty, int srcx, int srcy,
 
   Rectangle srcRec = { (float)srcx, (float)srcy, (float)wd, (float)ht };
   Rectangle dstRec = { (float)dstx, (float)dsty, (float)wd, (float)ht };
-  Color tint = ColorAlpha(::WHITE, (float)src->alpha / 255.0f);
+  Color tint = ColorAlpha(Color{255, 255, 255, 255}, (float)src->alpha / 255.0f);
 
   DrawTexturePro(src->texture(), srcRec, dstRec, Vector2{0.0f, 0.0f}, 0.0f, tint);
 }
@@ -206,7 +208,7 @@ void Renderer::drawSurfaceMirrored(Surface *src, int dstx, int dsty, int srcx, i
 
   Rectangle srcRec = { (float)srcx, (float)srcy, -(float)wd, (float)ht }; // Negative width mirrors
   Rectangle dstRec = { (float)dstx, (float)dsty, (float)wd, (float)ht };
-  Color tint = ColorAlpha(::WHITE, (float)src->alpha / 255.0f);
+  Color tint = ColorAlpha(Color{255, 255, 255, 255}, (float)src->alpha / 255.0f);
 
   DrawTexturePro(src->texture(), srcRec, dstRec, Vector2{0.0f, 0.0f}, 0.0f, tint);
 }
@@ -223,11 +225,6 @@ void Renderer::blitPatternAcross(Surface *sfc, int x_dst, int y_dst, int y_src, 
     drawSurface(sfc, x, y_dst, 0, y_src, w, height);
     x += w;
   }
-}
-
-void Renderer::clearScreen(NXColor color)
-{
-  ClearBackground(color.toRaylib());
 }
 
 void Renderer::clearScreen(uint8_t r, uint8_t g, uint8_t b)

@@ -3,16 +3,16 @@
 
 #include "ObjManager.h"
 #include "ai/weapons/whimstar.h"
-#include "autogen/sprites.h"
+#include "sprites.h"
 #include "caret.h"
-#include "common/misc.h"
+#include "misc.h"
 #include "console.h"
 #include "game.h"
 #include "input.h"
 #include "nx.h"
 #include "player.h"
 #include "playerstats.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "statusbar.h"
 
 static int empty_timer = 0;

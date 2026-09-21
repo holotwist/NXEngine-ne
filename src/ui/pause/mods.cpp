@@ -1,13 +1,13 @@
 
 #include "pause.h"
 
-#include "../autogen/sprites.h"
-#include "../game.h"
-#include "../map.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../nx.h"
-#include "../ResourceManager.h"
+#include "sprites.h"
+#include "game.h"
+#include "map.h"
+#include "Renderer.h"
+#include "input.h"
+#include "nx.h"
+#include "ResourceManager.h"
 
 using namespace NXE::Graphics;
 

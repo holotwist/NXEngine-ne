@@ -1,6 +1,6 @@
 #ifndef __AIREGU_H_
 #define __AIREGU_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_jenka(Object *o);
 void ai_doctor(Object *o);

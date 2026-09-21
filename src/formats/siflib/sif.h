@@ -2,7 +2,7 @@
 #ifndef _SIF_H
 #define _SIF_H
 
-#include "../common/misc.h" // stprintf
+#include "misc.h" // stprintf
 
 // a sprite has certain settings global to the whole sprite.
 // each sprite also contains a certain number of frames.

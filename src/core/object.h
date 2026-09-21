@@ -1,7 +1,7 @@
 #ifndef _OBJECT_H
 #define _OBJECT_H
 #include "floattext.h"
-#include "siflib/sif.h"
+#include "sif.h"
 // used in SpawnXP
 #define XP_SMALL_AMT 1
 #define XP_MED_AMT 5

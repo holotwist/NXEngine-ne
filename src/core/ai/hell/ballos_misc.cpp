@@ -1,16 +1,16 @@
 #include "ballos_misc.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Tileset.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "misc.h"
+#include "game.h"
+#include "Tileset.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 
 INITFUNC(AIRoutines)
 {

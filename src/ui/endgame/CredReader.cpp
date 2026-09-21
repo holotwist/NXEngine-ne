@@ -1,11 +1,11 @@
 
 #include "CredReader.h"
 
-#include "../ResourceManager.h"
-#include "../Utils/Logger.h"
-#include "../game.h"
-#include "../nx.h"
-#include "../tsc.h"
+#include "ResourceManager.h"
+#include "Logger.h"
+#include "game.h"
+#include "nx.h"
+#include "tsc.h"
 
 /*
 CREDITS FORMAT (credit.tsc)

@@ -1,18 +1,18 @@
 #include "balcony.h"
 
-#include "../../ObjManager.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
-#include "../ai.h"
-#include "../stdai.h"
-#include "../sym/smoke.h"
+#include "ObjManager.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "trig.h"
+#include "ai.h"
+#include "stdai.h"
+#include "sym/smoke.h"
 using namespace NXE::Graphics;
-#include "../../autogen/sprites.h"
+#include "sprites.h"
 
 INITFUNC(AIRoutines)
 {

@@ -1,14 +1,14 @@
 
 #include "statusbar.h"
 
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "nx.h"
 using namespace NXE::Graphics;
-#include "autogen/sprites.h"
+#include "sprites.h"
 #include "screeneffect.h"
 #include "game.h"
 #include "player.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 
 #ifdef WIDESCREEN
 #define STATUS_X 10

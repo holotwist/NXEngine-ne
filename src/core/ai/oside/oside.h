@@ -1,6 +1,6 @@
 #ifndef __AIOSIDE_H_
 #define __AIOSIDE_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_night_spirit(Object *o);
 void ai_night_spirit_shot(Object *o);

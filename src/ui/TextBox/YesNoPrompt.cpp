@@ -1,12 +1,12 @@
 
 #include "YesNoPrompt.h"
 
-#include "../autogen/sprites.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../nx.h"
-#include "../player.h"
-#include "../sound/SoundManager.h"
+#include "sprites.h"
+#include "Renderer.h"
+#include "input.h"
+#include "nx.h"
+#include "player.h"
+#include "SoundManager.h"
 using namespace NXE::Graphics;;
 
 enum

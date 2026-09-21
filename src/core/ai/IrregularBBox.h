@@ -1,7 +1,7 @@
 
 #ifndef _IRREGULARBBOX_H
 #define _IRREGULARBBOX_H
-#include "../object.h"
+#include "object.h"
 
 #define IB_MAX_BBOXES 4
 

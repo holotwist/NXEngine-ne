@@ -1,15 +1,15 @@
 
 #include "TextBox.h"
 
-#include "../autogen/sprites.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../nx.h"
-#include "../game.h"
-#include "../settings.h"
-#include "../sound/SoundManager.h"
-#include "../Utils/Logger.h"
-#include "../i18n/minibidi.h"
+#include "sprites.h"
+#include "Renderer.h"
+#include "input.h"
+#include "nx.h"
+#include "game.h"
+#include "settings.h"
+#include "SoundManager.h"
+#include "Logger.h"
+#include "minibidi.h"
 
 #include <utf8.h>
 #include <iostream>

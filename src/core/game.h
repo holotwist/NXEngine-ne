@@ -3,9 +3,9 @@
 #define _GAME_H
 
 #include "ObjManager.h"
-#include "TextBox/TextBox.h"
-#include "i18n/translate.h"
-#include "sound/SoundManager.h"
+#include "TextBox.h"
+#include "translate.h"
+#include "SoundManager.h"
 #include "stageboss.h"
 #include "statusbar.h"
 #include "tsc.h"

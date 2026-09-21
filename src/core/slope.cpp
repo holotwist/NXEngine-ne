@@ -1,9 +1,9 @@
 
 #include "slope.h"
 
-#include "Utils/Logger.h"
+#include "Logger.h"
 #include "game.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "map.h"
 #include "nx.h"
 

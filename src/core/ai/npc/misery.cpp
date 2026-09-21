@@ -1,15 +1,15 @@
 #include "misery.h"
 
-#include "../../ObjManager.h"
-#include "../../common/misc.h"
-#include "../../Utils/Logger.h"
-#include "../../game.h"
-#include "../../map.h"
-#include "../../screeneffect.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
-#include "../ai.h"
-#include "../stdai.h"
+#include "ObjManager.h"
+#include "misc.h"
+#include "Logger.h"
+#include "game.h"
+#include "map.h"
+#include "screeneffect.h"
+#include "SoundManager.h"
+#include "trig.h"
+#include "ai.h"
+#include "stdai.h"
 
 INITFUNC(AIRoutines)
 {

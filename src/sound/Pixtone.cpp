@@ -4,24 +4,20 @@
 /* https://bisqwit.iki.fi/jutut/kuvat/programming_examples/doukutsu-org/orgplay.cc */
 
 #include "Pixtone.h"
+#include "ResourceManager.h"
+#include "misc.h"
+#include "Logger.h"
+#include "config.h"
+#include "settings.h"
+#include "Common.h"
 
-#include "../ResourceManager.h"
-#include "../common/misc.h"
-#include "../Utils/Logger.h"
-#include "../config.h"
-
-#include <SDL.h>
-#include <SDL_mixer.h>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
-#include <functional>
 #include <iomanip>
 #include <sstream>
 #include <vector>
-
-// using std::fgetc;
 
 namespace NXE
 {
@@ -244,43 +240,26 @@ Pixtone *Pixtone::getInstance()
   return Singleton<Pixtone>::get();
 }
 
-std::function<void(int chan)> sfxCallback;
-
-void mySfxCallback(int chan)
-{
-  sfxCallback(chan);
-}
-
 bool Pixtone::init()
 {
-  if (_inited)
-  {
-    LOG_ERROR("pxt_init: pxt module already initialized");
-    return false;
-  }
-  else
-    _inited = true;
-
-  for (uint16_t i = 0; i < 256; i++)
-    _sound_fx[i].channel = -1;
+  if (_inited) return false;
+  _inited = true;
 
   for (uint32_t seed = 0, i = 0; i < 256; ++i)
   {
-    seed                       = (seed * 214013) + 2531011;          // Linear congruential generator
-    wave[MOD_SINE].table[i]    = 0x40 * std::sin(i * 3.1416 / 0x80); // Sine
-    wave[MOD_TRI].table[i]     = ((0x40 + i) & 0x80) ? 0x80 - i : i; // Triangle
-    wave[MOD_SAWUP].table[i]   = -0x40 + i / 2;                      // Sawtooth up
-    wave[MOD_SAWDOWN].table[i] = 0x40 - i / 2;                       // Sawtooth down
-    wave[MOD_SQUARE].table[i]  = 0x40 - (i & 0x80);                  // Square
-    wave[MOD_NOISE].table[i]   = (signed char)(seed >> 16) / 2;      // Pseudorandom
+    seed                       = (seed * 214013) + 2531011;
+    wave[MOD_SINE].table[i]    = 0x40 * std::sin(i * 3.1416 / 0x80);
+    wave[MOD_TRI].table[i]     = ((0x40 + i) & 0x80) ? 0x80 - i : i;
+    wave[MOD_SAWUP].table[i]   = -0x40 + i / 2;
+    wave[MOD_SAWDOWN].table[i] = 0x40 - i / 2;
+    wave[MOD_SQUARE].table[i]  = 0x40 - (i & 0x80);
+    wave[MOD_NOISE].table[i]   = (signed char)(seed >> 16) / 2;
   }
 
-  uint32_t slot;
-
-  LOG_INFO("Loading Sound FX...");
+  LOG_INFO("Synthesizing Pixtone SFX...");
 
   std::string path = ResourceManager::getInstance()->getPathForDir("pxt/");
-  for (slot = 1; slot <= NUM_SOUNDS; slot++)
+  for (uint32_t slot = 1; slot <= NUM_SOUNDS; slot++)
   {
     std::ostringstream filename;
     filename << path << "fx" << std::hex << std::setw(2) << std::setfill('0') << slot << ".pxt";
@@ -290,243 +269,124 @@ bool Pixtone::init()
       continue;
     snd.render();
 
-    // upscale the sound to 16-bit for SDL_mixer then throw away the now unnecessary 8-bit data
     _prepareToPlay(&snd, slot);
     snd.freeBuf();
   }
-
-  sfxCallback = std::bind(&Pixtone::pxtSoundDone, this, std::placeholders::_1);
-  Mix_ChannelFinished(mySfxCallback);
 
   return true;
 }
 
 void Pixtone::shutdown()
 {
-  for (uint32_t i = 0; i <= NUM_SOUNDS; i++)
+  for (int i = 0; i < 256; i++)
   {
-    if (_sound_fx[i].chunk)
-    {
-      SDL_free(_sound_fx[i].chunk->abuf);
-      Mix_FreeChunk(_sound_fx[i].chunk);
-      _sound_fx[i].chunk = nullptr;
-    }
-    for (int i = 0; i < NUM_RESAMPLED_BUFFERS; i ++)
-    {
-      if (_sound_fx[i].resampled[i])
-      {
-        SDL_free(_sound_fx[i].resampled[i]->abuf);
-        Mix_FreeChunk(_sound_fx[i].resampled[i]);
-        _sound_fx[i].resampled[i] = nullptr;
-      }
-    }
+    _sounds[i].clear();
   }
 }
 
-int Pixtone::play(int32_t chan, int32_t slot, int32_t loop)
+void Pixtone::play(int32_t slot, int32_t loop)
 {
-  if (_sound_fx[slot].chunk)
-  {
-    chan                    = Mix_PlayChannel(chan, _sound_fx[slot].chunk, loop);
-    _sound_fx[slot].channel = chan;
-    _slots[chan]            = slot;
+  if (slot <= 0 || slot >= 256 || _sounds[slot].empty()) return;
 
-    if (chan < 0)
-    {
-      LOG_ERROR("Pixtone::play: Mix_PlayChannel returned error");
-    }
-    return chan;
-  }
-  else
+  PxtVoice *chosen = nullptr;
+  for (auto &v : _voices)
   {
-    LOG_ERROR("Pixtone::play: sound slot {} not rendered", slot);
-    return -1;
+    if (!v.active) { chosen = &v; break; }
   }
+  if (!chosen) chosen = &_voices[0];
+
+  chosen->slot = slot;
+  chosen->pos = 0.0f;
+  chosen->step = 1.0f;
+  chosen->loop = loop;
+  chosen->active = true;
 }
 
-int Pixtone::playResampled(int32_t chan, int32_t slot, int32_t loop, uint32_t percent)
+void Pixtone::playResampled(int32_t slot, uint32_t percent)
 {
-  if (_sound_fx[slot].chunk)
+  if (slot <= 0 || slot >= 256 || _sounds[slot].empty()) return;
+
+  stop(slot);
+
+  PxtVoice *chosen = nullptr;
+  for (auto &v : _voices)
   {
-    uint32_t resampled_rate = SAMPLE_RATE * (percent / 100);
-
-    int i;
-    int idx = -1;
-    int rslot = 0;
-
-    for (i = 0; i < NUM_RESAMPLED_BUFFERS; i++)
-    {
-      if (resampled_rate == _sound_fx[slot].resampled_rate[i])
-      {
-        idx = i; // found
-      }
-      if (_sound_fx[slot].resampled[i] == NULL)
-      {
-        if (rslot == 0)
-          rslot = i;
-      }
-    }
-
-    if (idx == -1)
-    {
-      SDL_AudioCVT cvt;
-
-      if (SDL_BuildAudioCVT(&cvt, AUDIO_S16, 2, SAMPLE_RATE, AUDIO_S16, 2, resampled_rate) == -1)
-      {
-        LOG_ERROR("SDL_BuildAudioCVT: {}", SDL_GetError());
-      }
-      cvt.len = _sound_fx[slot].chunk->alen;
-      cvt.buf = (Uint8 *)SDL_malloc(cvt.len * cvt.len_mult);
-      SDL_memcpy(cvt.buf, _sound_fx[slot].chunk->abuf, _sound_fx[slot].chunk->alen);
-
-      if (SDL_ConvertAudio(&cvt) == -1)
-      {
-        LOG_ERROR("SDL_ConvertAudio: {}", SDL_GetError());
-      }
-
-/*      if (_sound_fx[slot].resampled != NULL)
-      {
-        SDL_free(_sound_fx[slot].resampled->abuf);
-        SDL_free(_sound_fx[slot].resampled);
-        _sound_fx[slot].resampled = NULL;
-      }*/
-
-      Uint8 *sound_buf = (Uint8 *)SDL_malloc(cvt.len_cvt);
-      SDL_memcpy(sound_buf, (Uint8 *)cvt.buf, cvt.len_cvt);
-      SDL_free(cvt.buf);
-
-      _sound_fx[slot].resampled[rslot] = Mix_QuickLoad_RAW(sound_buf, cvt.len_cvt);
-      _sound_fx[slot].resampled_rate[rslot] = resampled_rate;
-      idx = rslot;
-    }
-
-    chan                    = Mix_PlayChannel(chan, _sound_fx[slot].resampled[idx], loop);
-    _sound_fx[slot].channel = chan;
-    _slots[chan]            = slot;
-
-    if (chan < 0)
-    {
-      LOG_ERROR("Pixtone::playResampled: Mix_PlayChannel returned error");
-    }
-    return chan;
+    if (!v.active) { chosen = &v; break; }
   }
-  else
-  {
-    LOG_ERROR("Pixtone::playResampled: sound slot {} not rendered", slot);
-    return -1;
-  }
-}
+  if (!chosen) chosen = &_voices[0];
 
-int Pixtone::prepareResampled(int32_t slot, uint32_t percent)
-{
-  if (_sound_fx[slot].chunk)
-  {
-    uint32_t resampled_rate = SAMPLE_RATE * (percent / 100);
-
-    int i;
-    int idx = -1;
-    int rslot = 0;
-
-    for (i = 0; i < NUM_RESAMPLED_BUFFERS; i++)
-    {
-      if (resampled_rate == _sound_fx[slot].resampled_rate[i])
-      {
-        idx = i; // found
-      }
-      if (_sound_fx[slot].resampled[i] == NULL)
-      {
-        if (rslot == 0)
-          rslot = i;
-      }
-    }
-
-    if (idx == -1) // not found
-    {
-      SDL_AudioCVT cvt;
-
-      if (SDL_BuildAudioCVT(&cvt, AUDIO_S16, 2, SAMPLE_RATE, AUDIO_S16, 2, resampled_rate) == -1)
-      {
-        LOG_ERROR("SDL_BuildAudioCVT: {}", SDL_GetError());
-      }
-      cvt.len = _sound_fx[slot].chunk->alen;
-      cvt.buf = (Uint8 *)SDL_malloc(cvt.len * cvt.len_mult);
-      SDL_memcpy(cvt.buf, _sound_fx[slot].chunk->abuf, _sound_fx[slot].chunk->alen);
-
-      if (SDL_ConvertAudio(&cvt) == -1)
-      {
-        LOG_ERROR("SDL_ConvertAudio: {}", SDL_GetError());
-      }
-
-/*
-      if (_sound_fx[slot].resampled != NULL)
-      {
-        SDL_free(_sound_fx[slot].resampled->abuf);
-        SDL_free(_sound_fx[slot].resampled);
-        _sound_fx[slot].resampled = NULL;
-      }
-*/
-
-      Uint8 *sound_buf = (Uint8 *)SDL_malloc(cvt.len_cvt);
-      SDL_memcpy(sound_buf, (Uint8 *)cvt.buf, cvt.len_cvt);
-      SDL_free(cvt.buf);
-
-      _sound_fx[slot].resampled[rslot] = Mix_QuickLoad_RAW(sound_buf, cvt.len_cvt);
-      _sound_fx[slot].resampled_rate[rslot] = resampled_rate;
-    }
-  }
-  else
-  {
-    LOG_ERROR("Pixtone::prepareResampled: sound slot {} not rendered", slot);
-    return -1;
-  }
-  return 0;
+  chosen->slot = slot;
+  chosen->pos = 0.0f;
+  chosen->step = (percent >= 200) ? ((float)percent / 1000.0f) : ((float)percent / 100.0f);
+  chosen->loop = -1;
+  chosen->active = true;
 }
 
 void Pixtone::stop(int32_t slot)
 {
-  if (_sound_fx[slot].channel != -1)
+  for (auto &v : _voices)
   {
-    Mix_HaltChannel(_sound_fx[slot].channel);
-    if (_sound_fx[slot].channel != -1)
-    {
-      _slots[_sound_fx[slot].channel] = -1;
-    }
+    if (v.active && v.slot == slot)
+      v.active = false;
   }
 }
 
-void Pixtone::pxtSoundDone(int channel)
+void Pixtone::mixActiveChannels(int16_t *stream, uint32_t frameCount)
 {
-  if (_slots[channel] != -1)
+  float vol = (float)settings->sfx_volume / 100.0f;
+  if (vol <= 0.0f) return;
+
+  for (auto &v : _voices)
   {
-    _sound_fx[_slots[channel]].channel = -1;
+    if (!v.active || v.slot < 0 || v.slot >= 256) continue;
+    const auto &buf = _sounds[v.slot];
+    if (buf.empty()) { v.active = false; continue; }
+
+    for (uint32_t i = 0; i < frameCount; i++)
+    {
+      uint32_t idx = (uint32_t)v.pos;
+      if (idx >= buf.size())
+      {
+        if (v.loop != 0)
+        {
+          v.pos = 0.0f;
+          idx = 0;
+        }
+        else
+        {
+          v.active = false;
+          break;
+        }
+      }
+
+      int16_t raw = buf[idx];
+      int32_t sample = (int32_t)(raw * vol);
+
+      int32_t outL = stream[i * 2] + sample;
+      int32_t outR = stream[i * 2 + 1] + sample;
+
+      stream[i * 2]     = (int16_t)clamp(outL, -32768, 32767);
+      stream[i * 2 + 1] = (int16_t)clamp(outR, -32768, 32767);
+
+      v.pos += v.step;
+    }
   }
 }
 
 void Pixtone::_prepareToPlay(stPXSound *snd, int32_t slot)
 {
-  // convert the buffer from 8-bit mono signed to 16-bit stereo signed
-  SDL_AudioCVT cvt;
+  _sounds[slot].clear();
+  if (!snd->final_buffer || snd->final_size == 0) return;
 
-  if (SDL_BuildAudioCVT(&cvt, AUDIO_S8, 1, 22050, AUDIO_S16, 2, SAMPLE_RATE) == -1)
+  // Upsample 8-bit 22050Hz mono to 16-bit 44100Hz mono
+  _sounds[slot].resize(snd->final_size * 2);
+  for (uint32_t i = 0; i < snd->final_size; i++)
   {
-    LOG_ERROR("SDL_BuildAudioCVT: {}", SDL_GetError());
+    int16_t s0 = ((int16_t)snd->final_buffer[i]) << 8;
+    int16_t s1 = (i + 1 < snd->final_size) ? (((int16_t)snd->final_buffer[i + 1]) << 8) : s0;
+    _sounds[slot][i * 2]     = s0;
+    _sounds[slot][i * 2 + 1] = (int16_t)(((int32_t)s0 + (int32_t)s1) / 2);
   }
-
-  cvt.len = snd->final_size;
-
-  cvt.buf = (Uint8 *)SDL_malloc(cvt.len * cvt.len_mult);
-  memcpy(cvt.buf, snd->final_buffer, snd->final_size);
-
-  if (SDL_ConvertAudio(&cvt) == -1)
-  {
-    LOG_ERROR("SDL_ConvertAudio: {}", SDL_GetError());
-  }
-
-  Uint8 *sound_buf = (Uint8 *)SDL_malloc(cvt.len_cvt);
-  SDL_memcpy(sound_buf, (Uint8 *)cvt.buf, cvt.len_cvt);
-  SDL_free(cvt.buf);
-
-  _sound_fx[slot].chunk = Mix_QuickLoad_RAW(sound_buf, cvt.len_cvt);
 }
 
 } // namespace Sound

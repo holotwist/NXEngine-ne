@@ -6,11 +6,11 @@
 #include "ObjManager.h"
 #include "ResourceManager.h"
 #include "ai/sym/smoke.h"
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "console.h"
 #include "debug.h"
-#include "endgame/credits.h"
+#include "credits.h"
 #include "game.h"
 #include "inventory.h"
 #include "map.h"
@@ -20,8 +20,8 @@
 #include "playerstats.h"
 #include "screeneffect.h"
 #include "settings.h"
-#include "sound/SoundManager.h"
-#include "graphics/Renderer.h"
+#include "SoundManager.h"
+#include "Renderer.h"
 
 #include <fstream>
 #include <map>
@@ -86,7 +86,9 @@ static void GenLTC(void)
   memset(mnemonic_lookup, 0xff, sizeof(mnemonic_lookup));
   for (i = 0; i < OP_COUNT; i++)
   {
-    mnemonic_lookup[MnemonicToIndex(cmd_table[i].mnemonic)] = i;
+    int idx = MnemonicToIndex(cmd_table[i].mnemonic);
+    if (idx >= 0)
+      mnemonic_lookup[idx] = i;
   }
 }
 

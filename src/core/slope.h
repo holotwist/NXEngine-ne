@@ -1,9 +1,9 @@
 
 #ifndef _SLOPE_H
 #define _SLOPE_H
-#include "graphics/Tileset.h"
+#include "Tileset.h"
 #include "object.h"
-#include "siflib/sif.h"
+#include "sif.h"
 
 // slope types
 #define SLOPE_CEIL_FWD1 1

@@ -1,6 +1,6 @@
 #ifndef __AINPCBALROG_H_
 #define __AINPCBALROG_H_
-#include "../../object.h"
+#include "object.h"
 
 void onspawn_balrog(Object *o);
 void ai_balrog(Object *o);

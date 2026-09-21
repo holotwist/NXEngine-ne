@@ -1,7 +1,7 @@
 #ifndef _MAP_H
 #define _MAP_H
 
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "object.h"
 
 #include <string>

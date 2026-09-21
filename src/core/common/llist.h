@@ -2,7 +2,7 @@
 #ifndef _LLIST_H
 #define _LLIST_H
 
-#include "../Utils/Logger.h"
+#include "Logger.h"
 
 // this file provides macros which implement common operations on linked lists.
 // this saves a little bit of thinking and helps prevent bugs caused by

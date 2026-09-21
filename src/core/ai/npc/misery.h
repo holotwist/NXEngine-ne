@@ -1,6 +1,6 @@
 #ifndef __AIMISERY_H_
 #define __AIMISERY_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_misery_float(Object *o);
 void ai_miserys_bubble(Object *o);

@@ -1,6 +1,6 @@
 #ifndef __AICURLYAI_H_
 #define __AICURLYAI_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_curly_ai(Object *o);
 static void CaiJUMP(Object *o);

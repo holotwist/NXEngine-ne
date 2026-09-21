@@ -1,20 +1,20 @@
 #include "last_cave.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../caret.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../map.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
-#include "../ai.h"
-#include "../plantation/plantation.h" // ai_droll_shot
-#include "../stdai.h"
-#include "../sym/smoke.h"
-#include "../sym/sym.h" // ai_press
+#include "ObjManager.h"
+#include "sprites.h"
+#include "caret.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "map.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "trig.h"
+#include "ai.h"
+#include "plantation/plantation.h" // ai_droll_shot
+#include "stdai.h"
+#include "sym/smoke.h"
+#include "sym/sym.h" // ai_press
 
 using namespace NXE::Graphics;
 

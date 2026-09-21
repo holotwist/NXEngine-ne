@@ -1,8 +1,8 @@
 
 #include "sifloader.h"
 
-#include "../common/misc.h"
-#include "../Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 
 #include <cstdio>
 #include <cstdlib>

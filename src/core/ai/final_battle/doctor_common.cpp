@@ -1,10 +1,10 @@
 #include "doctor_common.h"
 
-#include "../../ObjManager.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../sound/SoundManager.h"
-#include "../stdai.h"
+#include "ObjManager.h"
+#include "game.h"
+#include "Renderer.h"
+#include "SoundManager.h"
+#include "stdai.h"
 
 using namespace NXE::Graphics;
 

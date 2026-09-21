@@ -6,7 +6,7 @@
 #ifndef _ORGANYA_H
 #define _ORGANYA_H
 
-#include "../Singleton.h"
+#include "Singleton.h"
 #include "SoundManager.h"
 
 #include <cstdint>
@@ -75,7 +75,7 @@ public:
   void runFade();
   void pause();
   void resume();
-  void _musicCallback(void *udata, uint8_t *stream, uint32_t len);
+  void renderAudio(int16_t *stream, uint32_t frameCount);
 
 protected:
   friend class Singleton<Organya>;

@@ -1,6 +1,6 @@
 #ifndef __AIEGG2_H_
 #define __AIEGG2_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_dragon_zombie(Object *o);
 void ai_falling_spike_small(Object *o);

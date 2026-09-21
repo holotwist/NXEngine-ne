@@ -1,8 +1,8 @@
 
 #ifndef _OMEGA_H
 #define _OMEGA_H
-#include "../../object.h"
-#include "../../stageboss.h"
+#include "object.h"
+#include "stageboss.h"
 
 class OmegaBoss : public StageBoss
 {

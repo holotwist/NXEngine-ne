@@ -1,11 +1,7 @@
 #include "Logger.h"
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-#include "../common/misc.h"
-
-#include <iostream>
-#include <memory>
-#include <string>
+#include <cstdio>
+#include <ctime>
+#include <mutex>
 
 namespace NXE
 {
@@ -13,30 +9,64 @@ namespace Utils
 {
 namespace Logger
 {
-  static const char *LOG_PATTERN = "%^[%H:%M:%S.%e] [%l] [%@ %!]: %v%$";
-  std::vector<spdlog::sink_ptr> sinks;
 
-  void init(std::string filename)
+static FILE *s_log_file = nullptr;
+static std::mutex s_log_mutex;
+
+void init(const std::string &filename)
+{
+  std::lock_guard<std::mutex> lock(s_log_mutex);
+  if (s_log_file)
   {
-    sinks.push_back(std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-    sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(widen(filename), true));
+    fclose(s_log_file);
+    s_log_file = nullptr;
+  }
+  if (!filename.empty())
+  {
+    s_log_file = fopen(filename.c_str(), "w");
+  }
+}
 
-    spdlog::set_default_logger(std::make_shared<spdlog::logger>("nxe logger", begin(sinks), end(sinks)));
+void log_write(Level level, const char *file, int line, const std::string &msg)
+{
+  std::lock_guard<std::mutex> lock(s_log_mutex);
 
-    spdlog::set_pattern(LOG_PATTERN);
+  static const char *level_names[] = {
+    "TRACE", "DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"
+  };
 
-    spdlog::set_error_handler([](const std::string &msg) {
-        std::cerr << "spdlog error: " << msg << std::endl;
-    });
+  const char *tag = (level >= LEVEL_TRACE && level <= LEVEL_CRITICAL) ? level_names[level] : "INFO";
 
-    spdlog::flush_on(spdlog::level::debug);
-#if defined(DEBUG)
-    spdlog::set_level(spdlog::level::trace);
+  time_t now = time(nullptr);
+  struct tm tm_info;
+#if defined(_WIN32)
+  localtime_s(&tm_info, &now);
 #else
-    spdlog::set_level(spdlog::level::info);
+  localtime_r(&now, &tm_info);
 #endif
+  char time_buf[32];
+  strftime(time_buf, sizeof(time_buf), "%H:%M:%S", &tm_info);
+
+  const char *base_file = file;
+  for (const char *p = file; *p; p++)
+  {
+    if (*p == '/' || *p == '\\')
+      base_file = p + 1;
   }
 
+  char header[128];
+  snprintf(header, sizeof(header), "[%s] [%s] [%s:%d]: ", time_buf, tag, base_file, line);
+
+  FILE *out = (level >= LEVEL_WARN) ? stderr : stdout;
+  fprintf(out, "%s%s\n", header, msg.c_str());
+  fflush(out);
+
+  if (s_log_file)
+  {
+    fprintf(s_log_file, "%s%s\n", header, msg.c_str());
+    fflush(s_log_file);
+  }
+}
 
 } // namespace Logger
 } // namespace Utils

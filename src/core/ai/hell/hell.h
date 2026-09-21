@@ -1,6 +1,6 @@
 #ifndef __AIHELL_H_
 #define __AIHELL_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_bute_flying(Object *o);
 void ai_bute_spawner(Object *o);

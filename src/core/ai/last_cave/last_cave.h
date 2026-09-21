@@ -1,6 +1,6 @@
 #ifndef __AILC_H_
 #define __AILC_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_proximity_press_vert(Object *o);
 void ai_critter_hopping_red(Object *o);

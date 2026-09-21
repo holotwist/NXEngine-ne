@@ -10,18 +10,35 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Platform Configuration
 option(BUILD_EXTRACTOR "Build the exe data extractor tool" ON)
 
-include(FetchContent)
+# Raylib resolution
+set(RAYLIB_PATH "" CACHE PATH "Path to local Raylib build or installation root")
 
-set(SUPPORT_MODULE_RAUDIO OFF CACHE BOOL "Disable Raylib internal audio" FORCE)
-set(BUILD_EXAMPLES OFF CACHE BOOL "Disable Raylib examples" FORCE)
-set(BUILD_GAMES OFF CACHE BOOL "Disable Raylib games" FORCE)
+if(RAYLIB_PATH)
+    message(STATUS "Using user-specified Raylib at: ${RAYLIB_PATH}")
+    find_library(RAYLIB_LIB NAMES raylib PATHS "${RAYLIB_PATH}/lib" "${RAYLIB_PATH}" NO_DEFAULT_PATH)
+    find_path(RAYLIB_INCLUDE_DIR NAMES raylib.h PATHS "${RAYLIB_PATH}/include" "${RAYLIB_PATH}" NO_DEFAULT_PATH)
 
-FetchContent_Declare(
-    raylib
-    GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    GIT_TAG 5.0
-)
-FetchContent_MakeAvailable(raylib)
+    if(RAYLIB_LIB AND RAYLIB_INCLUDE_DIR)
+        add_library(raylib UNKNOWN IMPORTED)
+        set_target_properties(raylib PROPERTIES
+            IMPORTED_LOCATION "${RAYLIB_LIB}"
+            INTERFACE_INCLUDE_DIRECTORIES "${RAYLIB_INCLUDE_DIR}"
+        )
+    else()
+        message(FATAL_ERROR "Could not find raylib library or header in: ${RAYLIB_PATH}")
+    endif()
+else()
+    find_package(raylib 4.5 QUIET)
+    if(NOT raylib_FOUND)
+        find_package(PkgConfig REQUIRED)
+        pkg_check_modules(RAYLIB REQUIRED raylib)
+        add_library(raylib UNKNOWN IMPORTED)
+        set_target_properties(raylib PROPERTIES
+            IMPORTED_LOCATION "${RAYLIB_LINK_LIBRARIES}"
+            INTERFACE_INCLUDE_DIRECTORIES "${RAYLIB_INCLUDE_DIRS}"
+        )
+    endif()
+endif()
 
 # Global Include Directories
 set(ENGINE_INCLUDES
@@ -40,6 +57,10 @@ set(ENGINE_INCLUDES
     ${CMAKE_CURRENT_SOURCE_DIR}/src/platform
     ${CMAKE_CURRENT_SOURCE_DIR}/src/sound
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/TextBox
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/intro
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/pause
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ui/endgame
 )
 
 # Target Asset Extractor
@@ -47,6 +68,8 @@ if(BUILD_EXTRACTOR AND NOT ANDROID)
     file(GLOB EXTRACT_SRC
         "src/extract/*.cpp"
         "src/core/common/misc.cpp"
+        "src/core/utils/Logger.cpp"
+        "src/formats/stagedata.cpp"
     )
     add_executable(nxextract ${EXTRACT_SRC})
     target_include_directories(nxextract PRIVATE
@@ -55,6 +78,7 @@ if(BUILD_EXTRACTOR AND NOT ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/common
         ${CMAKE_CURRENT_SOURCE_DIR}/src/core/utils
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/formats
     )
     target_compile_definitions(nxextract PRIVATE EXTRACTOR_TOOL)
 endif()

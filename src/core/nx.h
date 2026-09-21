@@ -2,12 +2,11 @@
 #ifndef _NX_H
 #define _NX_H
 
-#include <SDL.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 //#include <unistd.h>
-#include "common/basics.h"
+#include "basics.h"
 #include "config.h"
 #include "version.h"
 

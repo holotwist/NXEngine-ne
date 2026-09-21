@@ -1,11 +1,10 @@
 
 #include "niku.h"
 
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "ResourceManager.h"
 
-#include <SDL.h>
 #include <cstdio>
 #include <string>
 

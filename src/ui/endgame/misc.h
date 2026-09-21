@@ -1,6 +1,6 @@
 #ifndef __EMISC_H_
 #define __EMISC_H_
-#include "../object.h"
+#include "object.h"
 
 void ai_cloud_spawner(Object *o);
 void ai_cloud(Object *o);

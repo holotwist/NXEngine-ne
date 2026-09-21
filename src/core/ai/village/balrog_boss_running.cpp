@@ -1,12 +1,12 @@
 #include "balrog_boss_running.h"
 
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../ai.h"
-#include "../balrog_common.h"
-#include "../maze/balrog_boss_missiles.h"
-#include "../stdai.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "ai.h"
+#include "balrog_common.h"
+#include "maze/balrog_boss_missiles.h"
+#include "stdai.h"
 
 #define STATE_CHARGE 10
 #define STATE_JUMP 20

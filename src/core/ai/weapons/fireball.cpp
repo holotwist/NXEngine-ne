@@ -1,10 +1,10 @@
 #include "fireball.h"
 
-#include "../../ObjManager.h"
-#include "../../autogen/sprites.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../sound/SoundManager.h"
+#include "ObjManager.h"
+#include "sprites.h"
+#include "game.h"
+#include "Renderer.h"
+#include "SoundManager.h"
 #include "weapons.h"
 
 using namespace NXE::Graphics;

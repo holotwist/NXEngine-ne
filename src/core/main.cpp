@@ -11,7 +11,7 @@
 #endif
 //#include "main.h"
 #include "game.h"
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "input.h"
 #include "map.h"
 #include "profile.h"
@@ -21,227 +21,61 @@
 #include "tsc.h"
 
 #include <raylib.h>
-using namespace NXE::Graphics;
 #include "ResourceManager.h"
 #include "caret.h"
-#include "common/misc.h"
+#include "misc.h"
 #include "console.h"
 #include "screeneffect.h"
-#include "sound/SoundManager.h"
-#include "Utils/Logger.h"
+#include "SoundManager.h"
+#include "Logger.h"
+
+using namespace NXE::Graphics;
 using namespace NXE::Utils;
-
-#if defined(__SWITCH__)
-#include <switch.h>
-#include <iostream>
-#endif
-
-#if defined(__VITA__)
-// increase default allowed heap size on Vita
-int _newlib_heap_size_user = 100 * 1024 * 1024;
-#endif
-
 using namespace NXE::Sound;
-
-int fps                  = 0;
-static int fps_so_far    = 0;
-static uint32_t fpstimer = 0;
-
-#define GAME_WAIT (1000 / GAME_FPS) // sets framerate
-int framecount    = 0;
-bool freezeframe  = false;
-int flipacceltime = 0;
 
 static void fatal(const char *str)
 {
   LOG_CRITICAL("fatal: '{}'", str);
-
-  SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Fatal Error", str, NULL);
-}
-
-/*static bool check_data_exists()
-{
-char fname[MAXPATHLEN];
-
-        sprintf(fname, "%s/npc.tbl", data_dir);
-        if (file_exists(fname)) return 0;
-
-        fatal("Missing \"data\" directory.\nPlease copy it over from a Doukutsu installation.");
-
-        return 1;
-}*/
-
-void update_fps()
-{
-  fps_so_far++;
-
-  if ((SDL_GetTicks() - fpstimer) >= 500)
-  {
-    fpstimer   = SDL_GetTicks();
-    fps        = (fps_so_far << 1);
-    fps_so_far = 0;
-  }
-
-  char fpstext[64];
-  sprintf(fpstext, "%d fps", fps);
-
-  int x = (Renderer::getInstance()->screenWidth - 4) - Renderer::getInstance()->font.getWidth(fpstext);
-  Renderer::getInstance()->font.draw(x, 4, fpstext, 0x00FF00, true);
 }
 
 static inline void run_tick()
 {
-  static bool can_tick       = true;
-#if defined(DEBUG)
-  static bool last_freezekey = false;
-  static bool last_framekey  = false;
-#endif
-  static int frameskip       = 0;
-
   input_poll();
-
-  // input handling for a few global things
 
   if (justpushed(F9KEY))
   {
     Renderer::getInstance()->saveScreenshot();
   }
 
-  // freeze frame
-#if defined(DEBUG)
-  if (inputs[FREEZE_FRAME_KEY] && !last_freezekey)
+  // Render game frame to virtual target
+  Renderer::getInstance()->beginFrame();
+  game.tick();
+
+  if (settings->show_fps)
   {
-    can_tick = true;
-    freezeframe ^= 1;
-    framecount = 0;
+    char fpstext[32];
+    snprintf(fpstext, sizeof(fpstext), "%d fps", GetFPS());
+    int x = (Renderer::getInstance()->screenWidth - 4) - Renderer::getInstance()->font.getWidth(fpstext);
+    Renderer::getInstance()->font.draw(x, 4, fpstext, 0x00FF00, true);
   }
 
-  if (inputs[FRAME_ADVANCE_KEY] && !last_framekey)
-  {
-    can_tick = true;
-    if (!freezeframe)
-    {
-      freezeframe = 1;
-      framecount  = 0;
-    }
-  }
-
-  last_freezekey = inputs[FREEZE_FRAME_KEY];
-  last_framekey  = inputs[FRAME_ADVANCE_KEY];
-
-  // fast-forward key (F5)
-
-  if (inputs[FFWDKEY])
-  {
-    game.ffwdtime = 2;
-  }
-
-#endif
-
-  if (can_tick)
-  {
-    game.tick();
-
-    if (freezeframe)
-    {
-      char buf[1024];
-      sprintf(buf, "[] Tick %d", framecount++);
-      Renderer::getInstance()->font.draw(4, (Renderer::getInstance()->screenHeight - Renderer::getInstance()->font.getHeight() - 4), buf, 0x00FF00, true);
-      sprintf(buf, "Left: %d, Right: %d, JMP: %d, FR: %d, ST: %d", inputs[LEFTKEY], inputs[RIGHTKEY], inputs[JUMPKEY],
-              inputs[FIREKEY], inputs[STRAFEKEY]);
-      Renderer::getInstance()->font.draw(80, (Renderer::getInstance()->screenHeight - Renderer::getInstance()->font.getHeight() - 4), buf, 0x00FF00, true);
-      can_tick = false;
-    }
-
-    if (settings->show_fps)
-    {
-      update_fps();
-    }
-
-    if (!flipacceltime)
-    {
-      Renderer::getInstance()->flip();
-    }
-    else
-    {
-      flipacceltime--;
-      if (--frameskip < 0)
-      {
-        Renderer::getInstance()->flip();
-        frameskip = 256;
-      }
-    }
-
-    memcpy(lastinputs, inputs, sizeof(lastinputs));
-  }
-  else
-  { // frame is frozen; don't hog CPU
-    SDL_Delay(20);
-  }
+  Renderer::getInstance()->endFrame();
+  Renderer::getInstance()->flip();
 
   SoundManager::getInstance()->runFade();
 }
 
-void AppMinimized(void)
-{
-  LOG_DEBUG("Game minimized or lost focus--pausing...");
-  NXE::Sound::SoundManager::getInstance()->pause();
-  for (;;)
-  {
-    if (Renderer::getInstance()->isWindowVisible())
-    {
-      break;
-    }
-
-    input_poll();
-    SDL_Delay(20);
-  }
-  NXE::Sound::SoundManager::getInstance()->resume();
-  LOG_DEBUG("Focus regained, resuming play...");
-}
-
 void gameloop(void)
 {
-  int32_t nexttick = 0;
-
   game.switchstage.mapno = -1;
 
-  while (game.running && game.switchstage.mapno < 0)
+  while (game.running && !WindowShouldClose() && game.switchstage.mapno < 0)
   {
-    // get time until next tick
-    int32_t curtime       = SDL_GetTicks();
-    int32_t timeRemaining = nexttick - curtime;
-
-    if (timeRemaining <= 0 || game.ffwdtime)
-    {
-      run_tick();
-
-      // try to "catch up" if something else on the system bogs us down for a moment.
-      // but if we get really far behind, it's ok to start dropping frames
-      if (game.ffwdtime)
-        game.ffwdtime--;
-
-      nexttick = curtime + GAME_WAIT;
-
-#if !defined(DEBUG)
-      // pause game if window minimized
-      if (!Renderer::getInstance()->isWindowVisible())
-      {
-        AppMinimized();
-        nexttick = 0;
-      }
-#endif
-    }
-    else
-    {
-      // don't needlessly hog CPU, but don't sleep for entire
-      // time left, some CPU's/kernels will fall asleep for
-      // too long and cause us to run slower than we should
-      timeRemaining /= 2;
-      if (timeRemaining)
-        SDL_Delay(timeRemaining);
-    }
+    run_tick();
   }
+
+  if (WindowShouldClose())
+    game.running = false;
 }
 
 void InitNewGame(bool with_intro)
@@ -299,23 +133,9 @@ int main(int argc, char *argv[])
 #endif
 
   (void)ResourceManager::getInstance();
-
   Logger::init(ResourceManager::getInstance()->getPrefPath("debug.log"));
-//  SDL_LogSetAllPriority(SDL_LOG_PRIORITY_VERBOSE);
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
-  {
-    LOG_CRITICAL("ack, sdl_init failed: {}.", SDL_GetError());
-    return 1;
-  }
 
-  int flags = IMG_INIT_PNG;
-  int initted = IMG_Init(flags);
-  if((initted & flags) != flags) {
-    LOG_CRITICAL("IMG_Init: Failed to init required png support: {}", IMG_GetError());
-    return 1;
-  }
-
-  // start up inputs first thing because settings_load may remap them
+  // Initialize controls
   input_init();
 
   // load settings, or at least get the defaults,
@@ -376,7 +196,7 @@ int main(int argc, char *argv[])
   else
     game.setmode(GM_INTRO);
 
-  SDL_free(profile_name);
+  free(profile_name);
 
   // for debug
   if (game.paused)
@@ -463,10 +283,6 @@ shutdown:;
   textbox.Deinit();
   NXE::Sound::SoundManager::getInstance()->shutdown();
   Renderer::getInstance()->close();
-#if defined(__SWITCH__)
-  romfsExit();
-#endif
-  SDL_Quit();
   return error;
 
 ingame_error:;

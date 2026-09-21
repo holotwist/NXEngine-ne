@@ -1,6 +1,6 @@
 #ifndef __AIBALCONY_H_
 #define __AIBALCONY_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_helicopter(Object *o);
 void ai_helicopter_blade(Object *o);

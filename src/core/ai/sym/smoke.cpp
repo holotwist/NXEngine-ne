@@ -1,12 +1,12 @@
 
 #include "smoke.h"
 
-#include "../../ObjManager.h"
-#include "../../common/misc.h"
-#include "../../game.h"
-#include "../../graphics/Renderer.h"
-#include "../../trig.h"
-#include "../stdai.h"
+#include "ObjManager.h"
+#include "misc.h"
+#include "game.h"
+#include "Renderer.h"
+#include "trig.h"
+#include "stdai.h"
 
 using namespace NXE::Graphics;
 

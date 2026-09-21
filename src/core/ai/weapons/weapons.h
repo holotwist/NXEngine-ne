@@ -1,9 +1,9 @@
 
 #ifndef _WEAPONS_H
 #define _WEAPONS_H
-#include "../../caret.h"
-#include "../../object.h"
-#include "../stdai.h"
+#include "caret.h"
+#include "object.h"
+#include "stdai.h"
 
 uint8_t run_shot(Object *o, bool destroys_blocks);
 enum run_shot_result

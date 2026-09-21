@@ -1,9 +1,9 @@
 #include "object.h"
 
 #include "ai/sym/smoke.h"
-#include "autogen/sprites.h"
-#include "common/llist.h"
-#include "graphics/Renderer.h"
+#include "sprites.h"
+#include "llist.h"
+#include "Renderer.h"
 #include "nx.h"
 using namespace NXE::Graphics;
 #include "ai/ai.h"
@@ -13,9 +13,9 @@ using namespace NXE::Graphics;
 #include "map.h"
 #include "player.h"
 #include "slope.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 #include "tsc.h"
-#include "Utils/Logger.h"
+#include "Logger.h"
 
 //#define CSF 9
 

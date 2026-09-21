@@ -2,11 +2,10 @@
 #include "settings.h"
 
 #include "ResourceManager.h"
-#include "common/misc.h"
-#include "Utils/Logger.h"
+#include "misc.h"
+#include "Logger.h"
 #include "input.h"
 
-#include <SDL.h>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>

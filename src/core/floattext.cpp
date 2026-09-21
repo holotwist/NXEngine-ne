@@ -1,7 +1,7 @@
 
 #include "floattext.h"
 
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "nx.h"
 #include "object.h"
 using namespace NXE::Graphics;

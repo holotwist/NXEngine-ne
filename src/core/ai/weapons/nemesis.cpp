@@ -1,8 +1,8 @@
 #include "nemesis.h"
 
-#include "../../ObjManager.h"
-#include "../../common/misc.h"
-#include "../../game.h"
+#include "ObjManager.h"
+#include "misc.h"
+#include "game.h"
 #include "weapons.h"
 
 INITFUNC(AIRoutines)
@@ -23,7 +23,8 @@ void ai_nemesis_shot(Object *o)
   Object *enemy;
   if ((enemy = damage_enemies(o)))
   {
-    if ((++o->timer2 > 4 / pow(2, o->shot.level)) || (enemy->flags & FLAG_INVULNERABLE))
+    int maxHits = 4 >> o->shot.level;
+    if ((++o->timer2 > maxHits) || (enemy->flags & FLAG_INVULNERABLE))
     {
       o->Delete();
       return;

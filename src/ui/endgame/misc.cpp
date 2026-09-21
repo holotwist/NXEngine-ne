@@ -1,14 +1,14 @@
 #include "misc.h"
 
-#include "../ObjManager.h"
-#include "../ai/ai.h"
-#include "../ai/stdai.h"
-#include "../autogen/sprites.h"
-#include "../common/misc.h"
-#include "../game.h"
-#include "../map.h"
-#include "../player.h"
-#include "../graphics/Renderer.h"
+#include "ObjManager.h"
+#include "ai/ai.h"
+#include "ai/stdai.h"
+#include "sprites.h"
+#include "misc.h"
+#include "game.h"
+#include "map.h"
+#include "player.h"
+#include "Renderer.h"
 using namespace NXE::Graphics;
 
 INITFUNC(AIRoutines)

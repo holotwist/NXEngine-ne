@@ -1,19 +1,19 @@
 
 #include "title.h"
 
-#include "../TextBox/TextBox.h"
-#include "../autogen/sprites.h"
-#include "../Utils/Logger.h"
-#include "../graphics/Renderer.h"
-#include "../input.h"
-#include "../map.h"
-#include "../niku.h"
-#include "../nx.h"
-#include "../profile.h"
-#include "../ResourceManager.h"
-#include "../settings.h"
-#include "../sound/SoundManager.h"
-#include "../statusbar.h"
+#include "TextBox.h"
+#include "sprites.h"
+#include "Logger.h"
+#include "Renderer.h"
+#include "input.h"
+#include "map.h"
+#include "niku.h"
+#include "nx.h"
+#include "profile.h"
+#include "ResourceManager.h"
+#include "settings.h"
+#include "SoundManager.h"
+#include "statusbar.h"
 using namespace NXE::Graphics;
 
 // music and character selections for the different Counter times

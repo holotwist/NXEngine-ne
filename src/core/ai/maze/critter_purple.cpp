@@ -1,11 +1,11 @@
 #include "critter_purple.h"
 
-#include "../../game.h"
-#include "../../player.h"
-#include "../../sound/SoundManager.h"
-#include "../../trig.h"
-#include "../ai.h"
-#include "../stdai.h"
+#include "game.h"
+#include "player.h"
+#include "SoundManager.h"
+#include "trig.h"
+#include "ai.h"
+#include "stdai.h"
 
 #define STATE_IDLE 1         // waiting for player to come near
 #define STATE_PREPARE_JUMP 2 // on ground, prepare to jump

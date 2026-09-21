@@ -1,14 +1,14 @@
 
 #include "dialog.h"
 
-#include "../game.h"
-#include "../graphics/Renderer.h"
-#include "../nx.h"
+#include "game.h"
+#include "Renderer.h"
+#include "nx.h"
 using namespace NXE::Graphics;
-#include "../TextBox/TextBox.h"
-#include "../autogen/sprites.h"
-#include "../input.h"
-#include "../sound/SoundManager.h"
+#include "TextBox.h"
+#include "sprites.h"
+#include "input.h"
+#include "SoundManager.h"
 
 using namespace Options;
 extern std::vector<void *> optionstack;

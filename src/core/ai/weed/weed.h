@@ -1,6 +1,6 @@
 #ifndef __AIWEED_H_
 #define __AIWEED_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_critter(Object *o);
 void ai_bat_hang(Object *o);

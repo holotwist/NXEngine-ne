@@ -12,7 +12,7 @@
 
 #include "basics.h"
 #include "misc.h"
-#include "../utils/Logger.h"
+#include "Logger.h"
 
 // Check endianness using standard built-in macros
 #if !defined(__BYTE_ORDER__) || (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)

@@ -1,9 +1,9 @@
 #include "SoundManager.h"
 #include "Pixtone.h"
 #include "Organya.h"
-#include "platform/ResourceManager.h"
+#include "ResourceManager.h"
 #include "core/common/misc.h"
-#include "core/utils/Logger.h"
+#include "Logger.h"
 #include "core/game.h"
 #include "core/settings.h"
 

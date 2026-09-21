@@ -1,6 +1,6 @@
 #ifndef __AIBALLOSMISC_H_
 #define __AIBALLOSMISC_H_
-#include "../../object.h"
+#include "object.h"
 
 void ai_ballos_skull(Object *o);
 void ai_ballos_spikes(Object *o);

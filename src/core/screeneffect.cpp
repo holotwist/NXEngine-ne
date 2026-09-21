@@ -1,9 +1,9 @@
 
 #include "screeneffect.h"
 
-#include "graphics/Renderer.h"
+#include "Renderer.h"
 #include "nx.h"
-#include "sound/SoundManager.h"
+#include "SoundManager.h"
 using namespace NXE::Graphics;
 #include "map.h"
 
