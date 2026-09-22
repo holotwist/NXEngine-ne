@@ -39,7 +39,17 @@ public:
 
   std::string getPathForDir(const std::string &dir);
 
+  struct LanguageInfo {
+    std::string id;
+    std::string name;
+    std::string author;
+    bool rtl = false;
+  };
+
   std::vector<std::string> &languages();
+  const std::vector<LanguageInfo> &languageInfos() const { return _languageInfos; }
+  std::string getLanguageDisplayName(const std::string &id);
+
   Mod& mod(std::string& name);
   void setMod(std::string name);
   Mod& mod();
@@ -55,6 +65,7 @@ protected:
   std::string _language;
   void findLanguages();
   std::vector<std::string> _languages;
+  std::vector<LanguageInfo> _languageInfos;
   std::string _mod = "";
   void findMods();
   std::map<std::string,Mod> _mods;

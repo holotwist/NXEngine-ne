@@ -3,6 +3,7 @@
 #define _CREDITS_READER_H
 
 #include <string>
+#include <vector>
 
 enum CC
 {
@@ -46,6 +47,8 @@ private:
 
   std::string data;
   int dataindex, datalen;
+  std::vector<std::string> json_lines;
+  size_t json_line_idx = 0;
 };
 
 #endif

@@ -1,0 +1,160 @@
+{
+  "0100": [
+    "Cerrado."
+  ],
+  "0101": [
+    "Usaste la =Llave de Arthur=."
+  ],
+  "0104": [
+    "Soy Jack,",
+    "el segundo al mando por aquí.",
+    "Esta puerta lleva al cementerio\nMimiga, donde descansa el héroe\nArthur.",
+    "Oh, ¿que qué estoy haciendo,\npreguntas?",
+    "Bueno, han estado brotando hongos en\nel cementerio,",
+    "así que estoy cuidando la puerta para\nasegurarme de que no salgan."
+  ],
+  "0111": [
+    "¡¿Qué?!",
+    "¡¿Secuestraron a Toroko?!",
+    "¡Oh, no!",
+    "¡Tengo que avisarle a King de\ninmediato!"
+  ],
+  "0200": [
+    "Abriste el cofre.",
+    "¡Conseguiste el =Sistema de Mapas=!"
+  ],
+  "0201": [
+    "Hay algo escrito aquí...",
+    "Mientras mantengas tu espíritu de\nexploración, seguro encontrarás la\nsalida. Esto creo firmemente."
+  ],
+  "0301": [
+    ".....",
+    "¿Qué? ¿No eres un enemigo?",
+    "Pensé con certeza que eran\nellos...",
+    "Soy King.",
+    "Soy el número uno de esta\naldea.",
+    "No es que signifique gran cosa,\ncon solo seis de nosotros vivos.",
+    "Bueno, siete contando a Sue.",
+    "Aunque ella no es una de nosotros.",
+    "Solo es una forastera que apareció\nhace poco."
+  ],
+  "0302": [
+    "¡Entrega la llave!",
+    "¡No! ¡No lo haré!",
+    "¿Estás intentando proteger\na Sue?",
+    "¡Es una extraña!\n¡No es una de nosotros!",
+    "Sue es una buena persona.",
+    "¡Nunca la traicionaría!",
+    "Toroko...",
+    "Cuando venga el Doctor, sabes\nque se llevará a alguien de nuevo...",
+    "Si no entregamos a Sue, tal vez\nseas tú a quien se lleve en su\nlugar.",
+    "Pero... Pero...",
+    "¡La llave, Toroko!",
+    "¡¿?!"
+  ],
+  "0305": [
+    "Maldita sea con Toroko...",
+    "Salió corriendo a algún lado\ncuando te caíste."
+  ],
+  "0306": [
+    "¡Grrrrr!",
+    "¡Toroko!",
+    "¡No te vas a escapar tan fácil!"
+  ],
+  "0308": [
+    "¡Dame la llave!",
+    "¡No!"
+  ],
+  "0311": [
+    "*ñam ñam*",
+    "¡!",
+    "¡Ay! Me asustaste...",
+    "¿Sue?",
+    "Ah, claro.",
+    "La niña en la casa de Arthur, ¿no?",
+    "Está viviendo con Toroko.",
+    "Una chica dulce, la verdad.",
+    "Dice que está buscando a un\n\"Dragón Celeste\"...",
+    "Dragones que surcan los cielos...\n¿Acaso cosas así realmente existen?"
+  ],
+  "0312": [
+    "Ah, tú otra vez.",
+    "Llevaron a Sue arriba.",
+    "Dicen que es su culpa que hayan\natrapado a Toroko."
+  ],
+  "0313": [
+    "Vaya que se escucha movimiento en\nla casa de Arthur...",
+    "¿Tienen una fiesta o qué?"
+  ],
+  "0314": [
+    "¿Qué?",
+    "¿Secuestraron a Toroko?",
+    "Vaya, qué mal.",
+    "Ahora la única chica que queda en\nla aldea es Sue..."
+  ],
+  "0400": [
+    "¡Sáquenme de aquí ahora mismo!",
+    "¡Cállate la boca!",
+    "¡TÚ eres la razón por la que\nsecuestraron a Toroko!",
+    "Nuestra única opción es entregarte\na ellos y esperar lo mejor.",
+    "¡Engendro de ojos raros!",
+    "¡Si Toroko no regresa a salvo,\nte juro que te despedazaré miembro\npor miembro!"
+  ],
+  "0420": [
+    "¿Así que somos... armas?",
+    "Así es.",
+    "El Doctor quiere usar las flores\nrojas para hacer que ataquen a los\nhumanos.",
+    "¿P--Por qué querría hacer\neso?!",
+    "Ese hombre es...\n...es como un demonio.",
+    "¿Y va a usar esas flores en Toroko?",
+    "Por lo que sé, todavía las está\nbuscando.",
+    "Solo podemos rezar para que no las\nencuentre.",
+    "Si...",
+    "Si encuentra esas flores,\nToroko...",
+    "Se volvería loca...\nUn arma mortal...",
+    "¡Nunca permitiré que eso pase!"
+  ],
+  "0500": [
+    "Arriba: Granja Yamashita\n    Izquierda: Embalse   Derecha: Cementerio\n           Abajo: Casa de Arthur"
+  ],
+  "0501": [
+    "Granja Yamashita"
+  ],
+  "0502": [
+    "Embalse"
+  ],
+  "0503": [
+    "Cementerio Mimiga\n             ¡Peligro! Prohibido el paso"
+  ],
+  "0504": [
+    "Casa de Arthur"
+  ],
+  "0505": [
+    "Sala de Asambleas"
+  ],
+  "0600": [
+    "Sí, estoy atrapada...",
+    "Los secuaces del Doctor secuestraron\na una Mimiga pensando que era yo.",
+    "Se llama Toroko,",
+    "y cuando ninguno de los otros\nMimigas quería saber nada de mí,",
+    "ella fue la única amable y buena.",
+    ".....",
+    "Ya sé.",
+    "¿Por qué no vas en mi lugar?",
+    "Mi hermano está en un lugar llamado\nPueblo Hierba.",
+    "Encuéntralo y tráelo aquí."
+  ],
+  "0601": [
+    "Encuentra a mi hermano y tráelo\naquí.",
+    "Puedes llegar a Pueblo Hierba usando\nel teletransportador en la casa de\nArthur."
+  ],
+  "0602": [
+    "¿Ya encontraste a mi hermano?"
+  ],
+  "0610": [
+    "Este es el destino de todos los que\nalteran el orden de nuestra aldea."
+  ],
+  "0611": [
+    "Aún esperando..."
+  ]
+}

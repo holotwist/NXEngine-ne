@@ -170,6 +170,7 @@ if [ "$PACKAGE" -eq 1 ]; then
 
     cp "${BUILD_DIR}/nxengine-ne" "${PKG_STAGE}/"
     [ -f "${BUILD_DIR}/nxextract" ] && cp "${BUILD_DIR}/nxextract" "${PKG_STAGE}/"
+    [ -f "${BUILD_DIR}/nxtranslate" ] && cp "${BUILD_DIR}/nxtranslate" "${PKG_STAGE}/"
     command -v strip >/dev/null 2>&1 && strip -s "${PKG_STAGE}/nxengine-ne" 2>/dev/null || true
 
     [ -d "data" ] && cp -r data "${PKG_STAGE}/"

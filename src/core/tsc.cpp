@@ -121,15 +121,15 @@ bool TSC::Init(void)
   _curscript.running = false;
 
   // load the "common" TSC scripts available to all maps
-  if (!Load(ResourceManager::getInstance()->getPath("Head.tsc"), ScriptPages::SP_HEAD))
+  if (!Load(ResourceManager::getInstance()->getPath("Head.tsc"), ScriptPages::SP_HEAD, "Head.tsc"))
     return false;
 
   // load the inventory screen scripts
-  if (!Load(ResourceManager::getInstance()->getPath("ArmsItem.tsc"), ScriptPages::SP_ARMSITEM))
+  if (!Load(ResourceManager::getInstance()->getPath("ArmsItem.tsc"), ScriptPages::SP_ARMSITEM, "ArmsItem.tsc"))
     return false;
 
   // load stage select/teleporter scripts
-  if (!Load(ResourceManager::getInstance()->getPath("StageSelect.tsc"), ScriptPages::SP_STAGESELECT))
+  if (!Load(ResourceManager::getInstance()->getPath("StageSelect.tsc"), ScriptPages::SP_STAGESELECT, "StageSelect.tsc"))
     return false;
 
   return true;
@@ -144,7 +144,7 @@ void TSC::Close(void)
 }
 
 // load a tsc file and return the highest script # in the file
-bool TSC::Load(const std::string &fname, ScriptPages pageno)
+bool TSC::Load(const std::string &fname, ScriptPages pageno, const std::string &rel_name)
 {
   ScriptPage *page = &_script_pages[(int)pageno];
   int fsize;
@@ -166,9 +166,7 @@ bool TSC::Load(const std::string &fname, ScriptPages pageno)
     return false;
   }
 
-  // now "compile" all the scripts in the TSC
-  // int top_script = CompileScripts(buf, fsize, base);
-  result = Compile(buf.c_str(), fsize, pageno);
+  result = Compile(buf.c_str(), fsize, pageno, rel_name);
 
   return result;
 }
@@ -272,12 +270,35 @@ static void ReadText(std::vector<uint8_t> *script, const char **buf, const char 
 
 // compile a tsc file--a set of scripts in raw text format--into 'bytecode',
 // and place the finished scripts into the given page.
-bool TSC::Compile(const char *buf, int bufsize, ScriptPages pageno)
+#include <json.hpp>
+
+bool TSC::Compile(const char *buf, int bufsize, ScriptPages pageno, const std::string &rel_name)
 {
   ScriptPage *page             = &_script_pages[(int)pageno];
   const char *buf_end          = (buf + (bufsize - 1));
   std::vector<uint8_t> *script = NULL;
   char cmdbuf[4]               = {0};
+
+  // Load language JSON overrides if available
+  nlohmann::json lang_json;
+  bool has_lang_json = false;
+  if (!rel_name.empty())
+  {
+    std::string json_name = rel_name;
+    size_t ext = json_name.rfind(".tsc");
+    if (ext != std::string::npos) json_name.replace(ext, 4, ".json");
+
+    std::string json_path = ResourceManager::getInstance()->getPath(json_name);
+    std::ifstream jf(widen(json_path), std::ios::binary);
+    if (jf.is_open())
+    {
+      lang_json = nlohmann::json::parse(jf, nullptr, false);
+      has_lang_json = !lang_json.is_discarded() && lang_json.is_object();
+    }
+  }
+
+  std::string cur_event_key;
+  size_t cur_text_idx = 0;
 
   LOG_TRACE("tsc_compile bufsize = {} pageno = {}", bufsize, (int)pageno);
 
@@ -299,6 +320,11 @@ bool TSC::Compile(const char *buf, int bufsize, ScriptPages pageno)
         LOG_ERROR("tsc_compile: invalid script number: {}", scriptno);
         return false;
       }
+
+      char ev_key[8];
+      snprintf(ev_key, sizeof(ev_key), "%04d", scriptno);
+      cur_event_key = ev_key;
+      cur_text_idx  = 0;
 
       // skip the CR after the script #
       while (buf < buf_end)
@@ -352,7 +378,32 @@ bool TSC::Compile(const char *buf, int bufsize, ScriptPages pageno)
     { // text for message boxes
       buf--;
       script->push_back(OP_TEXT);
-      ReadText(script, &buf, buf_end);
+
+      // Read original text block
+      std::vector<uint8_t> orig_text;
+      ReadText(&orig_text, &buf, buf_end);
+
+      std::string text_str(reinterpret_cast<char *>(orig_text.data()));
+
+      // Inject translation if available
+      if (has_lang_json && contains_non_cr(text_str) &&
+          lang_json.contains(cur_event_key) && lang_json[cur_event_key].is_array() &&
+          cur_text_idx < lang_json[cur_event_key].size())
+      {
+        std::string trans = lang_json[cur_event_key][cur_text_idx++].get<std::string>();
+        // Convert \n back to \r for Cave Story textbox linebreaking
+        for (char c : trans)
+        {
+          if (c == '\n') script->push_back('\r');
+          else script->push_back(static_cast<uint8_t>(c));
+        }
+        script->push_back('\0');
+      }
+      else
+      {
+        if (contains_non_cr(text_str)) cur_text_idx++;
+        script->insert(script->end(), orig_text.begin(), orig_text.end());
+      }
     }
   }
 
@@ -517,16 +568,12 @@ bool TSC::JumpScript(int newscriptno, ScriptPages pageno)
   s->waitforkey    = false;
   s->wait_standing = false;
 
-  // <EVE doesn't clear textbox mode or the face etc
+  // Reset sign/prompt flags when jumping scripts
   if (textbox.IsVisible())
   {
     textbox.ClearText();
-
-    // see entrance to Sacred Grounds when you have the Nikumaru Counter
-    // to witness that EVE clears TUR.
-//    textbox.SetFlags(TB_LINE_AT_ONCE, false);
-//    textbox.SetFlags(TB_VARIABLE_WIDTH_CHARS, false);
-//    textbox.SetFlags(TB_CURSOR_NEVER_SHOWN, false);
+    textbox.SetFlags(TUR_PARAMS, false);
+    should_set_tao = false;
   }
 
   return 0;
@@ -1165,7 +1212,8 @@ void TSC::ExecScript(ScriptInstance *s)
       case OP_CLO: // dismiss text box.
         textbox.SetVisible(false);
         textbox.ClearText();
-        // ...don't ResetState(), or it'll clear <FAC during Momorin dialog (Hideout)
+        textbox.SetFlags(TUR_PARAMS, false);
+        should_set_tao = false;
         break;
 
       case OP_TEXT: // text to be displayed

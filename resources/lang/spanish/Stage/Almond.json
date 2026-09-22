@@ -1,0 +1,131 @@
+{
+  "0101": [
+    "No se abre..."
+  ],
+  "0200": [
+    "¿ABRIR COMPUERTA?",
+    "ABRIENDO COMPUERTA",
+    "ANOMALÍA DETECTADA EN\nLA COMPUERTA N.º 4"
+  ],
+  "0201": [
+    "ANOMALÍA DETECTADA EN\nLA COMPUERTA N.º 4"
+  ],
+  "0202": [
+    "¿BAJAR ELEVADOR?",
+    "BAJANDO ELEVADOR",
+    "ELEVADOR ABAJO"
+  ],
+  "0203": [
+    "EL ELEVADOR ESTÁ ABAJO"
+  ],
+  "0204": [
+    "ERROR"
+  ],
+  "0210": [
+    "¿ABRIR COMPUERTA?",
+    "ABRIENDO COMPUERTA",
+    "COMPUERTA ABIERTA"
+  ],
+  "0211": [
+    "COMPUERTA ABIERTA"
+  ],
+  "0212": [
+    "ERROR"
+  ],
+  "0240": [
+    "Hay algo enrollado en el brazo\ndel robot roto.",
+    "¿Quieres agarrarlo?",
+    "¡Conseguiste el =Cable de Remolque=!"
+  ],
+  "0241": [
+    "...¿?"
+  ],
+  "0242": [
+    "Está enredado.\nNo puedes soltarlo..."
+  ],
+  "0255": [
+    "Un robot roto.",
+    "Está muy dañado."
+  ],
+  "0300": [
+    "Qué lugar tan raro, ¿no?",
+    "Me pregunto si era\nalgún tipo de base."
+  ],
+  "0301": [
+    "Esta compuerta solo se abrió\nhasta la mitad.",
+    "Parece que se trabó\ncon algo..."
+  ],
+  "0302": [
+    "Puras compuertas.",
+    "Con tanta seguridad me da\ncuriosidad saber qué hay\naquí abajo.",
+    "¿Tú qué dices?"
+  ],
+  "0304": [
+    "Yo..."
+  ],
+  "0305": [
+    "¿Se desmayó?"
+  ],
+  "0306": [
+    "No responde..."
+  ],
+  "0307": [
+    "No se mueve, pero parece que\ntodavía sigue viva.",
+    "¿Quieres usar el =Cable de Remolque=?",
+    "Le amarraste el cable al cuerpo."
+  ],
+  "0340": [
+    "Se escucha cómo algo cede."
+  ],
+  "0452": [
+    "Mira.",
+    "Es un soldado de\nla superficie.",
+    "Está hecho pedazos.",
+    "Y hay un montón más\ncomo este.",
+    "¿Qué diablos pudo...?",
+    "Un Mimiga no.\nNo, para hacer tanto\ndaño...",
+    "¡¡¡!!!",
+    "¡¡Sigue vivo!!",
+    "*Bzzbzbzztbz*",
+    "EQUIPO 9 ANIQUILADO",
+    "FALLO AL DESTRUIR EL OBJETIVO",
+    "FUERZAS ACTUALES\nINSUFICIENTES",
+    "¡RETIRADA!",
+    "¡¡RETIRADA!!"
+  ],
+  "1000": [
+    "0",
+    "¡¿Lo logramos?!",
+    "¡Mjm!",
+    "¡Vaya, sí que pudieron!",
+    "¡Tú!",
+    "¡Eres la bruja que me\ntiró aquí abajo!",
+    "¡Más vale que esos\nniños estén bien!",
+    "¡Ja! ¡Cállate!",
+    "¡Ni que fueras su mamá!",
+    "¡¿Acaso saben qué\nes esto?!",
+    "¿Qué?",
+    "Mjm. Por esto es que\nodio a los robots.",
+    "¡Este es el corazón\nde la isla!",
+    "¡Si se detiene, la isla\nse va a caer a la tierra!",
+    "¿Ese era su gran plan?",
+    "¡¿Llevarse la isla con ustedes\npara hacerse los héroes?!",
+    "¡¡Tontos!!",
+    "¡Ey!",
+    "¿Qué están haciendo?\n¡Lleven el núcleo al\nlaboratorio de una vez!",
+    "¡Todavía hay tiempo!",
+    "¡¡UooooooOOOOOOOOH!!"
+  ],
+  "1100": [
+    "Tus sentidos se apagan y todo\nse vuelve oscuro..."
+  ],
+  "1101": [
+    "¿Sabías que la bruja Jenka\ntuvo un hermano hace tiempo?",
+    "Se llamaba Ballos.",
+    "Igual que su hermana, tenía\npoderes que iban mucho más allá\nde los de un mortal..."
+  ],
+  "1110": [
+    "......¿?",
+    "...Puedes respirar."
+  ]
+}

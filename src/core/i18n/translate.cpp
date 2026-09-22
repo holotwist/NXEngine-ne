@@ -30,14 +30,17 @@ bool I18N::load()
 
     for (auto it = langfile.begin(); it != langfile.end(); ++it)
     {
-      if (it.key() != "rtl")
+      if (it.key() != "rtl" && it.value().is_string())
       {
-        std::string result = it.value();
-        std::vector<uint32_t> utf32result;
-        utf8::utf8to32(result.begin(), result.end(), std::back_inserter(utf32result));
-        doBidi(&utf32result[0], utf32result.size(), true, false);
-        result.clear();
-        utf8::utf32to8(utf32result.begin(), utf32result.end(), std::back_inserter(result));
+        std::string result = it.value().get<std::string>();
+        if (_rtl)
+        {
+          std::vector<uint32_t> utf32result;
+          utf8::utf8to32(result.begin(), result.end(), std::back_inserter(utf32result));
+          doBidi(&utf32result[0], utf32result.size(), true, false);
+          result.clear();
+          utf8::utf32to8(utf32result.begin(), utf32result.end(), std::back_inserter(result));
+        }
         LOG_DEBUG("{}: {}", it.key(), result);
 
         _strings[ it.key() ] = std::move(result);

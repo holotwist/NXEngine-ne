@@ -68,9 +68,9 @@ public:
   void Clear();
   bool Init(void);
   void Close(void);
-  bool Load(const std::string &fname, ScriptPages pageno);
+  bool Load(const std::string &fname, ScriptPages pageno, const std::string &rel_name = "");
   std::string Decrypt(const std::string &fname, int *fsize_out);
-  bool Compile(const char *buf, int bufsize, ScriptPages pageno);
+  bool Compile(const char *buf, int bufsize, ScriptPages pageno, const std::string &rel_name = "");
   void RunScripts(void);
   void StopScripts(void);
   int GetCurrentScript(void);

@@ -1,0 +1,37 @@
+{
+  "0120": [
+    "¡Cuidado! Trampa mortal a tu izquierda.\n¡Un toque significa muerte instantánea!"
+  ],
+  "0300": [
+    "*¡Chisporroteo!* *¡Crack!*",
+    "El carbón arde intensamente."
+  ],
+  "0301": [
+    "¿Quieres usar el =Jugo de Medusa=?",
+    "Encuentras algo entre las cenizas...",
+    "¡Conseguiste el =Carbón=!"
+  ],
+  "0500": [
+    "Gracias, me salvaste de verdad.",
+    "Ten, te puedes quedar con esto.",
+    "¡Conseguiste la =Fireball=!",
+    "¿Buscas a alguien?",
+    "No he visto a nadie más por aquí.",
+    "Si quieres buscar más adentro,",
+    "tendrás que pasar por la chimenea en la\ncasa de Chaco..."
+  ],
+  "0503": [
+    "Puedes llegar a la parte interior de\nPueblo Hierba pasando por la chimenea en\nla casa de Chaco."
+  ],
+  "0504": [
+    "¿Necesitas algo de =Carbón=?",
+    "Puedes tomar lo que hay en mi chimenea,\nsi quieres."
+  ],
+  "0505": [
+    "¿Para qué necesitas carbón?"
+  ],
+  "0506": [
+    "Escuché una especie de estruendo afuera\nhace un momento.",
+    "Eso y gritos de terror..."
+  ]
+}

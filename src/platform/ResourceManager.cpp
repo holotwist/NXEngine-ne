@@ -141,7 +141,12 @@ std::string ResourceManager::getPath(const std::string &filename, bool localized
     _paths.push_back(_data + "mods/" + _mod + "/" + filename);
   }
 
-  if (localized) _paths.push_back(_data + "lang/" + std::string(settings->language) + "/" + filename);
+  std::string _base = getBasePath();
+  if (localized) {
+    _paths.push_back(_base + "resources/lang/" + std::string(settings->language) + "/" + filename);
+    _paths.push_back(_data + "lang/" + std::string(settings->language) + "/" + filename);
+  }
+  _paths.push_back(_base + "resources/" + filename);
   _paths.push_back(_data + filename);
 
   for (auto &_tryPath: _paths)
@@ -177,17 +182,59 @@ inline std::vector<std::string> glob(const std::string &pat)
 
 void ResourceManager::findLanguages()
 {
-  std::vector<std::string> langs = glob(getPathForDir("lang/") + "*");
-  _languages.push_back("english");
-  for (auto &l : langs)
-  {
-    std::ifstream ifs(widen(l + "/system.json"));
-    if (ifs.is_open())
-    {
-      ifs.close();
-      _languages.push_back(l.substr(l.find_last_of('/') + 1));
+  _languages.clear();
+  _languageInfos.clear();
+
+  auto registerLang = [this](const std::string &id, const std::string &folder) {
+    if (std::find(_languages.begin(), _languages.end(), id) != _languages.end()) return;
+
+    LanguageInfo info;
+    info.id = id;
+    info.name = id;
+
+    std::ifstream mf(widen(folder + "/meta.json"), std::ios::binary);
+    if (mf.is_open()) {
+      nlohmann::json meta = nlohmann::json::parse(mf, nullptr, false);
+      if (!meta.is_discarded()) {
+        info.name = meta.value("name", id);
+        info.author = meta.value("author", "");
+        info.rtl = meta.value("rtl", false);
+      }
+    }
+
+    _languages.push_back(id);
+    _languageInfos.push_back(info);
+  };
+
+  // Check both resources/lang and data/lang
+  std::vector<std::string> searchDirs = {
+    getBasePath() + "resources/lang/",
+    getPathForDir("lang/")
+  };
+
+  for (const auto &sdir : searchDirs) {
+    std::vector<std::string> found = glob(sdir + "*");
+    for (auto &l : found) {
+      if (fileExists(l + "/meta.json") || fileExists(l + "/system.json")) {
+        std::string id = l.substr(l.find_last_of('/') + 1);
+        registerLang(id, l);
+      }
     }
   }
+
+  // Ensure default english fallback exists
+  if (std::find(_languages.begin(), _languages.end(), "english") == _languages.end()) {
+    _languages.insert(_languages.begin(), "english");
+    _languageInfos.insert(_languageInfos.begin(), {"english", "English", "Studio Pixel / Aeon Genesis", false});
+  }
+}
+
+std::string ResourceManager::getLanguageDisplayName(const std::string &id)
+{
+  for (const auto &info : _languageInfos) {
+    if (info.id == id) return info.name;
+  }
+  return id;
 }
 
 std::vector<std::string> &ResourceManager::languages()

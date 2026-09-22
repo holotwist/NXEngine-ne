@@ -72,7 +72,7 @@ bool load_stage(int stage_no)
     return 1;
 
   sprintf(fname, "Stage/%s.tsc", mapname);
-  if (!game.tsc->Load(ResourceManager::getInstance()->getPath(fname), TSC::ScriptPages::SP_MAP))
+  if (!game.tsc->Load(ResourceManager::getInstance()->getPath(fname), TSC::ScriptPages::SP_MAP, fname))
     return 1;
   map_set_backdrop(stages[stage_no].bg_no);
   map.scrolltype = stages[stage_no].scroll_type;

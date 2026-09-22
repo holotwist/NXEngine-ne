@@ -1,0 +1,349 @@
+{
+  "1000": [
+    "Sin arma."
+  ],
+  "1001": [
+    "- Snake -\nAtraviesa las paredes.\nFabricada por Chaba en el Laberinto."
+  ],
+  "1002": [
+    "- Polar Star -\nEl arma más básica.\nLleva la marca de Polaris."
+  ],
+  "1003": [
+    "- Fireball -\nRebota por el suelo.\nBastante poderosa en pendientes suaves."
+  ],
+  "1004": [
+    "- Ametralladora -\nUn arma automática de disparo rápido.\nSe recarga sola con el tiempo."
+  ],
+  "1005": [
+    "- Lanzamisiles -\nGran alcance y daño demoledor.\nSin embargo, su munición es limitada."
+  ],
+  "1007": [
+    "- Bubbler -\nDe la chimenea de la Sala de Asambleas.\nCómo usarla depende de ti."
+  ],
+  "1009": [
+    "- Blade -\nUn arma de un solo golpe y gran daño.\nEl alma de King habita en su interior."
+  ],
+  "1010": [
+    "- Supermisil -\nUn misil electrizante.\nSu aceleración no tiene rival."
+  ],
+  "1012": [
+    "- Némesis -\nEl rayo de la Diosa.\nPara jugadores expertos."
+  ],
+  "1013": [
+    "- Spur -\nMantén presionado el botón para\ndisparar un láser."
+  ],
+  "1100": [
+    "Hajime"
+  ],
+  "1101": [
+    "Mick"
+  ],
+  "1102": [
+    "Shinobu"
+  ],
+  "1103": [
+    "Kakeru"
+  ],
+  "1104": [
+    "Nene"
+  ],
+  "1200": [
+    "Mascota de Jenka y líder de los perros.\nMientras buscaba a sus hermanos, se\nperdió y Curly lo acogió."
+  ],
+  "1201": [
+    "Mascota de Jenka. Le encanta buscar\ntesoros. O más bien *cofres* del tesoro,\ny hace poco le dio por dormir en ellos."
+  ],
+  "1202": [
+    "Mascota de Jenka. Le fascinan los lugares\noscuros. Debido a su mala visión, vaga en la\noscuridad guiado solo por su instinto."
+  ],
+  "1203": [
+    "Mascota de Jenka. Adora los huesos y los\nha enterrado en incontables lugares,\nla mayoría ya olvidados."
+  ],
+  "1204": [
+    "Mascota de Jenka. Pasa casi todo el tiempo\ndurmiendo, pero se dice que sus sueños\npueden predecir el futuro."
+  ],
+  "5000": [
+    "Sin objeto."
+  ],
+  "5001": [
+    "Llave de Arthur"
+  ],
+  "5002": [
+    "Sistema de Mapas"
+  ],
+  "5003": [
+    "Llave de Santa"
+  ],
+  "5004": [
+    "Relicario de Plata"
+  ],
+  "5005": [
+    "Colmillo de Bestia"
+  ],
+  "5006": [
+    "Cápsula de Vida"
+  ],
+  "5007": [
+    "Tarjeta de ID"
+  ],
+  "5008": [
+    "Jugo de Medusa"
+  ],
+  "5009": [
+    "Llave Oxidada"
+  ],
+  "5010": [
+    "Llave Chicle"
+  ],
+  "5011": [
+    "Goma Base"
+  ],
+  "5012": [
+    "Carbón"
+  ],
+  "5013": [
+    "Explosivo"
+  ],
+  "5014": [
+    "Perrito"
+  ],
+  "5015": [
+    "Frasco de Vida"
+  ],
+  "5016": [
+    "Panacea"
+  ],
+  "5017": [
+    "Llave de la Clínica"
+  ],
+  "5018": [
+    "Booster v0.8"
+  ],
+  "5019": [
+    "Barrera de Armas"
+  ],
+  "5020": [
+    "Turbocargador"
+  ],
+  "5021": [
+    "Tanque de Aire de Curly"
+  ],
+  "5022": [
+    "Contador Nikumaru"
+  ],
+  "5023": [
+    "Booster v2.0"
+  ],
+  "5024": [
+    "Máscara Mimiga"
+  ],
+  "5025": [
+    "Llave del Teletransportador"
+  ],
+  "5026": [
+    "Carta de Sue"
+  ],
+  "5027": [
+    "Controlador"
+  ],
+  "5028": [
+    "Aspersor Roto"
+  ],
+  "5029": [
+    "Aspersor"
+  ],
+  "5030": [
+    "Cable de Remolque"
+  ],
+  "5031": [
+    "Medalla de Arcilla"
+  ],
+  "5032": [
+    "Hombrecillo"
+  ],
+  "5033": [
+    "Insignia de Hongo"
+  ],
+  "5034": [
+    "Ma Pignon"
+  ],
+  "5035": [
+    "Ropa Interior de Curly"
+  ],
+  "5036": [
+    "Medalla Alienígena"
+  ],
+  "5037": [
+    "Lápiz Labial de Chaco"
+  ],
+  "5038": [
+    "Estrella Caprichosa"
+  ],
+  "5039": [
+    "Vínculo de Hierro"
+  ],
+  "6000": [
+    "Sin objeto."
+  ],
+  "6001": [
+    "La llave de la casa de Arthur.\nEstaba escondida cerca de su lápida."
+  ],
+  "6002": [
+    "No hay datos de este piso."
+  ],
+  "6003": [
+    "La llave de la casa de Santa."
+  ],
+  "6004": [
+    "Un relicario de plata con forma de pez.\nPor su estado, parece haber sido un\ntesoro apreciado durante años."
+  ],
+  "6005": [
+    "Un colmillo afilado hallado en la Granja\nYamashita. ¿Seguirá con vida su dueño...?"
+  ],
+  "6006": [
+    "Una cápsula de vida."
+  ],
+  "6007": [
+    "Una tarjeta de ID hallada en el Huevo N.º 06."
+  ],
+  "6008": [
+    "Un líquido capaz de apagar chimeneas."
+  ],
+  "6009": [
+    "Una llave oxidada."
+  ],
+  "6010": [
+    "Una etiqueta que dice \"Chicle\"."
+  ],
+  "6011": [
+    "Un trozo de goma de mascar."
+  ],
+  "6012": [
+    "Extraído de una chimenea."
+  ],
+  "6013": [
+    "Un explosivo para volar puertas\ny cosas por el estilo."
+  ],
+  "6014": [
+    "El perrito de Jenka."
+  ],
+  "6015": [
+    "Esto restaurará tu vida,\npero solo una vez. ¿Quieres usarlo?",
+    "Vida restaurada."
+  ],
+  "6016": [
+    "Al parecer, esto lo cura\nabsolutamente todo..."
+  ],
+  "6017": [
+    "Dice \"Clínica del Laberinto\"."
+  ],
+  "6018": [
+    "Pulsa el botón de salto en el aire\npara volar aún más alto.",
+    "¿Quieres equiparlo?",
+    "Booster equipado."
+  ],
+  "6019": [
+    "Al recibir daño, la cantidad de energía\nde arma perdida se reduce a la mitad."
+  ],
+  "6020": [
+    "Aumenta la velocidad a la que la\nametralladora recarga su munición."
+  ],
+  "6021": [
+    "Te permite respirar bajo el agua.\nCurly solía usarlo."
+  ],
+  "6022": [
+    "Un cronómetro totalmente automático.\nNo tiene ningún botón a la vista."
+  ],
+  "6023": [
+    "Pulsa el botón de salto en el aire y\npodrás moverte en cualquier dirección.",
+    "¿Quieres equiparlo?",
+    "Booster v2.0 equipado."
+  ],
+  "6024": [
+    "Una máscara Mimiga hecha por la madre\nde Sue. Te queda un poco grande..."
+  ],
+  "6025": [
+    "Una llave que pescó cierto Mimiga."
+  ],
+  "6026": [
+    "¿Quieres leerla?",
+    "Soy Sue.",
+    "Creo que nunca te conté\nmucho sobre nosotros.",
+    "Vinimos a esta isla desde\nla superficie en una expedición.",
+    "El Prof. Booster venía en nuestro\nhelicóptero, al igual que mi\nmadre, mi hermano,",
+    "varios asistentes...\ny también el Doctor.",
+    "Él estaba allí para atender nuestras\nnecesidades médicas, y así fue...",
+    "Al menos, hasta que encontró\nla Corona del Demonio...",
+    "Esa corona, antaño propiedad del\namo y señor de esta isla,",
+    "otorga monstruosos poderes\nmágicos a quien la porte...",
+    "El Doctor ya sabía esto antes\nde venir a la isla,",
+    "y por eso se coló en nuestro\ngrupo desde el principio.",
+    "Una vez tuvo la Corona en su\npoder, nadie pudo hacerle frente.",
+    "No tuvimos más opción que\ncontinuar investigando la isla\nbajo sus órdenes.",
+    "El Doctor busca dominar la\nsuperficie de la Tierra usando\nesta isla como base.",
+    "Creo que planea atacar primero la\nsuperficie usando a los Mimigas\ncomo armas.",
+    "En fin, logré escapar de algún\nmodo, pero temo que los demás\ninvestigadores ya estén...",
+    "Ahora está usando a los ingenuos\nMimigas para cultivar más y más\nflores rojas.",
+    "Cuando esté listo para atacar,\nhará que las flores vuelvan locos\na los Mimigas en un frenesí asesino.",
+    "Con sus terribles poderes, podrá\ncontrolar a los Mimigas enfurecidos\npara que cumplan sus órdenes.",
+    "Y eso significa que yo también...",
+    "Si logras escapar de esta celda,\nbusca el escondite secreto en la\nplantación.",
+    "Si mi madre aún está a salvo,\nestará allí, tramando un contraataque.",
+    "Por favor. Ayuda a mi madre.",
+    "La contraseña es\n\"Litagano Motscoud\".",
+    "Aquí termina la carta..."
+  ],
+  "6027": [
+    "Necesario para construir un cohete.\nEl orgullo de Itoh, el cobarde."
+  ],
+  "6028": [
+    "Un aspersor de agua averiado."
+  ],
+  "6029": [
+    "Está como nuevo. ...Tal vez."
+  ],
+  "6030": [
+    "Un cable de remolque para robots."
+  ],
+  "6031": [
+    "Pequeña y sumamente pesada.\nNo tiene ninguna utilidad."
+  ],
+  "6032": [
+    "¡Oye! ¿Ya casi llegamos?"
+  ],
+  "6033": [
+    "La insignia que te dio el hongo.\nNo tiene utilidad real. Para ser\nsinceros, no la necesitas para nada..."
+  ],
+  "6034": [
+    "Dicen que tiene el poder de\nrestaurar los recuerdos..."
+  ],
+  "6035": [
+    "Recuperada tras la pared. Ropa interior\nverde lima con un lindo distintivo.\nNo tiene ninguna utilidad."
+  ],
+  "6036": [
+    "Tiene grabada la silueta de un\nalienígena. No tiene utilidad."
+  ],
+  "6037": [
+    "Lápiz labial rojo.\nNo tiene ninguna utilidad."
+  ],
+  "6038": [
+    "Una baratija que te dio Chaba\nen el laberinto. Una estrella caprichosa.",
+    "¿Quieres equiparla?",
+    "Estrella Caprichosa equipada."
+  ],
+  "6039": [
+    "Tu lazo con Curly Brace, la única guerrera\na quien confiarías tu espalda. Seguro\nque volverán a encontrarse algún día..."
+  ],
+  "7018": [
+    "¿Quieres desequiparlo?",
+    "Booster desequipado."
+  ],
+  "7023": [
+    "¿Quieres desequiparlo?",
+    "Booster v2.0 desequipado."
+  ],
+  "7038": [
+    "¿Quieres desequiparla?",
+    "Estrella Caprichosa desequipada."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "0001": [
+    "Vacío."
+  ],
+  "0016": [
+    "¿Quieres guardar?",
+    "Partida guardada."
+  ],
+  "0017": [
+    "Salud restablecida."
+  ],
+  "0018": [
+    "Salud y misiles recargados."
+  ],
+  "0019": [
+    "¿Quieres descansar?",
+    ".....",
+    "Salud restablecida."
+  ],
+  "0030": [
+    "¡Obtuviste el =Lanzamisiles=!",
+    "El Lanzamisiles es un arma poderosa,\npero su munición es limitada.",
+    "Puedes recargar munición con los objetos\nque sueltan los enemigos."
+  ],
+  "0031": [
+    "¡Capacidad de misiles aumentada en",
+    "!"
+  ],
+  "0032": [
+    "¡Capacidad de misiles aumentada en",
+    "!"
+  ],
+  "0040": [
+    "Has muerto.",
+    "¿Quieres reintentar?"
+  ],
+  "0041": [
+    "Te has ahogado.",
+    "¿Quieres reintentar?"
+  ],
+  "0042": [
+    "Nadie volvió a verte jamás...",
+    "¿Quieres reintentar?"
+  ],
+  "0049": [
+    "XX: head.tsc   4000 - 4099\n4000:Almondï"
+  ]
+}

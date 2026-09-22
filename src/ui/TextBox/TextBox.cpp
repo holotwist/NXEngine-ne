@@ -86,8 +86,14 @@ void TextBox::SetVisible(bool enable, uint8_t flags)
     ClearText();
 
   fVisible = enable;
-  flags |= (fFlags & ~(TB_DRAW_AT_TOP | TB_NO_BORDER));
-  SetFlags(flags);
+  if (!enable)
+  {
+    fFlags = TB_DEFAULTS;
+  }
+  else
+  {
+    SetFlags(flags);
+  }
 }
 
 void TextBox::RecalculateOffsets()
@@ -435,6 +441,8 @@ void TextBox::AddNextChar(void)
     }
   }
 
+  int max_width_px = fCoords.w - 28 - (fFace != 0 ? (FACE_W + 8) : 0);
+
   while (!fCharsWaiting.empty())
   {
     std::string::iterator it;
@@ -456,6 +464,38 @@ void TextBox::AddNextChar(void)
       continue; // ignore LF's, we look only for CR
 
     LOG_DEBUG("ch: {}", (uint32_t)ch);
+
+    // Skip leading spaces on wrapped lines
+    if (!rtl() && ch == ' ' && fCurLineLen == 0)
+      continue;
+
+    // Word wrap, look ahead to see if the full word fits on current line
+    if (!rtl() && !line_at_once && ch != ' ' && ch != 13 && fCurLineLen > 0)
+    {
+      std::string word;
+      utf8::append(ch, std::back_inserter(word));
+      int word_chars = 1;
+
+      for (auto wit = fCharsWaiting.begin(); wit != fCharsWaiting.end(); )
+      {
+        char32_t wch = utf8::next(wit, fCharsWaiting.end());
+        if (wch == ' ' || wch == 13 || wch == 10 || wch == '<')
+          break;
+        utf8::append(wch, std::back_inserter(word));
+        word_chars++;
+      }
+
+      int cur_w  = Renderer::getInstance()->font.getWidth(fLines[fCurLine]);
+      int word_w = Renderer::getInstance()->font.getWidth(word);
+
+      if ((cur_w + word_w > max_width_px) || (fCurLineLen + word_chars > maxlinelen))
+      {
+        fCurLineLen = 0;
+        fCurLine++;
+        if (fCurLine >= MSG_NLINES - 1)
+          fScrolling = true;
+      }
+    }
 
     // go to next line on CR's, or wrap text if needed
     if ((fCurLineLen > maxlinelen) || ch == 13)

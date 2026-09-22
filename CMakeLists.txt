@@ -81,6 +81,12 @@ if(BUILD_EXTRACTOR AND NOT ANDROID)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/formats
     )
     target_compile_definitions(nxextract PRIVATE EXTRACTOR_TOOL)
+
+    # Extractor
+    add_executable(nxtranslate src/tools/nxtranslate.cpp)
+    target_include_directories(nxtranslate PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/deps
+    )
 endif()
 
 # Target NXEngine-ne

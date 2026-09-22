@@ -621,6 +621,10 @@ bool game_load(int num)
 
 bool game_load(Profile *p)
 {
+  // Terminate any active death/load scripts and reset dialog state
+  game.tsc->StopScripts();
+  textbox.ResetState();
+
   int i;
 
   player->hp        = p->hp;

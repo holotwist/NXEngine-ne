@@ -1,0 +1,82 @@
+{
+  "0200": [
+    "El misterioso robot,\nMonster X...",
+    "Tu oportunidad para atacar es\ncuando abre su compuerta."
+  ],
+  "0300": [
+    "Soy médico.",
+    "Ven, déjame restaurar tu salud.",
+    "No, no, no te cobro nada, no te preocupes.",
+    "A cambio, sin embargo, hay algo que me\ngustaría pedirte.",
+    "Hay una vieja clínica cerca de aquí.",
+    "Ve a ver si no queda algo de medicina\nallá adentro.",
+    "¡Conseguiste la =Llave de la Clínica=!"
+  ],
+  "0301": [
+    "La clínica no queda muy lejos.",
+    "Ve a buscar alguna medicina que se\nvea servible."
+  ],
+  "0302": [
+    "Le entregaste la =Panacea=.",
+    "¡Oh, la encontraste!",
+    "Muchísimas gracias.",
+    "Solo déjame encargarme del resto."
+  ],
+  "0303": [
+    "Muchísimas gracias.",
+    "Solo déjame encargarme del resto."
+  ],
+  "0304": [
+    "Parece que la medicina está\nfuncionando.",
+    "Estará como nueva en poco tiempo.",
+    "Todo gracias a ti, por supuesto."
+  ],
+  "0310": [
+    "Soy enfermera.",
+    "Trabajaba en la vieja clínica de\naquí cerca,",
+    "pero fue tomada por fantasmas y hui\nhasta acá."
+  ],
+  "0311": [
+    "¿Eres amigo de ella?",
+    "Si te preocupas por ella, te aconsejo\nhacer lo que dice el doctor."
+  ],
+  "0312": [
+    "Buen trabajo.",
+    "No viste ningún fantasma, ¿verdad?"
+  ],
+  "0313": [
+    "Oh, ¿viniste a ver cómo seguía la chica?",
+    "Se fue hacia la \"Cámara de la Roca\"."
+  ],
+  "0320": [
+    "¡Ah, hola!",
+    "Hacía tiempo que no te\nveía.",
+    "¡Te ves muy bien!",
+    "Esa bruja también te tiró\naquí abajo, ¿eh?",
+    "¡Igual que a mí!",
+    "Así que no pudiste derrotarlos\ndespués de todo...",
+    "La verdad tenía esperanzas en\nti, pero...",
+    "Y yo, lo intenté.\nVaya que lo intenté.",
+    "Y mira nada más adónde me\ntrajo.",
+    ".....",
+    "Y todo para nada.",
+    "Al final, no pude salvar a\nninguno de esos niños.",
+    "En el estado en el que estoy,\nno voy a salir de aquí pronto..."
+  ],
+  "0321": [
+    "Sobreviví, sí, pero ¿y ahora qué?",
+    "Supongo que me quedaré aquí a\npudrirme..."
+  ],
+  "0322": [
+    "Este es el legendario\nLaberinto.",
+    "No sé quién lo construyó,\npero aparentemente es el\nbasurero de la isla.",
+    "Solo hay una salida.",
+    "Tienes que pasar la roca gigante\nen la Cámara de la Roca.",
+    "Iría contigo,",
+    "pero con lo lastimada que\nestoy, solo sería un estorbo..."
+  ],
+  "0400": [
+    "Abriste el cofre del tesoro.",
+    "¡Conseguiste la =Barrera de Armas=!"
+  ]
+}

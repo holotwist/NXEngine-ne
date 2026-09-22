@@ -325,14 +325,8 @@ void _res_change(ODItem *item, int dir)
 
 void _lang_get(ODItem *item)
 {
-  std::vector<std::string> langs = ResourceManager::getInstance()->languages();
-  for (auto &l : langs)
-  {
-    if (strcmp(settings->language, l.c_str()) == 0)
-    {
-      strcpy(item->suffix, l.c_str());
-    }
-  }
+  std::string displayName = ResourceManager::getInstance()->getLanguageDisplayName(settings->language);
+  strcpy(item->suffix, displayName.c_str());
 }
 
 void _lang_change(ODItem *item, int dir)

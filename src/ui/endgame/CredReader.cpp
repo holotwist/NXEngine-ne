@@ -6,6 +6,10 @@
 #include "game.h"
 #include "nx.h"
 #include "tsc.h"
+#include "misc.h"
+
+#include <fstream>
+#include <json.hpp>
 
 /*
 CREDITS FORMAT (credit.tsc)
@@ -55,6 +59,11 @@ bool CredReader::ReadCommand(CredCommand *cmd)
       {
         cmd->text.push_back(c);
         c = get();
+      }
+
+      if (json_line_idx < json_lines.size())
+      {
+        cmd->text = json_lines[json_line_idx++];
       }
     }
     break;
@@ -117,6 +126,7 @@ void CredCommand::DumpContents()
 void CredReader::Rewind()
 {
   dataindex = 0;
+  json_line_idx = 0;
 }
 
 /*
@@ -141,6 +151,23 @@ bool CredReader::OpenFile(void)
     return 1;
   }
 
+  json_lines.clear();
+  json_line_idx = 0;
+  std::string json_path = ResourceManager::getInstance()->getPath("Credit.json");
+  std::ifstream jf(widen(json_path), std::ios::binary);
+  if (jf.is_open())
+  {
+    nlohmann::json cj = nlohmann::json::parse(jf, nullptr, false);
+    if (!cj.is_discarded() && cj.is_array())
+    {
+      for (const auto &item : cj)
+      {
+        if (item.is_string())
+          json_lines.push_back(item.get<std::string>());
+      }
+    }
+  }
+
   dataindex = 0;
   return 0;
 }
@@ -153,6 +180,8 @@ void CredReader::CloseFile()
     data    = "";
     datalen = 0;
   }
+  json_lines.clear();
+  json_line_idx = 0;
 }
 
 char CredReader::get()

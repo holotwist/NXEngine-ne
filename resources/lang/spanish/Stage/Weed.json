@@ -1,0 +1,156 @@
+{
+  "0100": [
+    "¿Quieres ir a la casa de\nArthur?"
+  ],
+  "0101": [
+    "Está cerrado."
+  ],
+  "0104": [
+    "Está cerrado."
+  ],
+  "0105": [
+    "Usaste la =Llave Oxidada=."
+  ],
+  "0109": [
+    "Parece estar cerrado.",
+    "La palabra \"Chicle\" está escrita en\nla puerta."
+  ],
+  "0110": [
+    "Usaste la =Llave Chicle=."
+  ],
+  "0121": [
+    "Casa de Santa"
+  ],
+  "0123": [
+    "Sala de Generadores"
+  ],
+  "0200": [
+    "¡Conseguiste la =Llave de Santa=!"
+  ],
+  "0201": [
+    "Vaya, vaya.",
+    "¿Un soldado de la superficie?",
+    "Pensé que la guerra ya había\nterminado.",
+    "Bueno, como sea."
+  ],
+  "0202": [
+    "Abriste el cofre del tesoro.",
+    "¡Conseguiste el =Jugo de Medusa=!"
+  ],
+  "0205": [
+    "Los ventiladores no están funcionando.",
+    "Alguien cortó la energía de esta zona.",
+    "Si quieres que vuelvan a funcionar,\ntendrás que encontrar la Sala de Generadores."
+  ],
+  "0206": [
+    "Déjame darte un consejo.",
+    "Si mantienes presionado el botón de salto\nmientras un ventilador te eleva,",
+    "volarás aún más alto."
+  ],
+  "0207": [
+    "Si vas a seguir adelante,\nten cuidado con esos Power Critters.",
+    "Cuando te caen encima, duele bastante."
+  ],
+  "0210": [
+    "La moto que manejaba Kazuma.\nYa no se ve en muy buen estado."
+  ],
+  "0220": [
+    "No abre..."
+  ],
+  "0230": [
+    "Espías a alguien a través de la grieta...",
+    "¡Oye! ¡Por aquí!",
+    "Pareces un buen muchacho.",
+    "¿Podrías ayudarme?\nDe verdad me gustaría salir de aquí.",
+    "¡Gracias!",
+    "Toma esto.",
+    "¡Recibiste la =Llave Oxidada=!",
+    "Encontré esto en el suelo.",
+    "Ve a abrir la puerta con ella, ¿quieres?"
+  ],
+  "0231": [
+    "¿En serio?...",
+    "Maldita sea..."
+  ],
+  "0232": [
+    "Por favor...",
+    "Ábreme la puerta..."
+  ],
+  "0233": [
+    "¿Qué?",
+    "¡¿No es la llave de este cuarto?!",
+    "Bueno, qué maravilla...",
+    "....."
+  ],
+  "0234": [
+    "No tiene cerradura.",
+    "La puerta debe estar oxidada y trabada."
+  ],
+  "0235": [
+    "Si no hay cerradura, entonces tendremos\nque derribar la puerta...",
+    "Ahora, cómo haríamos eso..."
+  ],
+  "0236": [
+    "¿Qué? ¿Explosivos?",
+    "Sí, eso podría funcionar...",
+    "¿Así que estás reuniendo los materiales?",
+    ".....",
+    "Espera, ¿dijiste goma base?",
+    "Aguanta un segundo.",
+    "Toma, llévate esto.",
+    "¡Recibiste la =Llave Chicle=!",
+    "Estaba colgada en la pared.",
+    "Dice \"Chicle\" en ella.",
+    "Debe haber alguna conexión.",
+    "¡Cuento contigo, muchacho!"
+  ],
+  "0237": [
+    "¿Y bien? ¿Ya tienes la bomba lista?"
+  ],
+  "0239": [
+    "Oxidada y trabada, igual que siempre..."
+  ],
+  "0240": [
+    "Oxidada y trabada, igual que siempre..."
+  ],
+  "0250": [
+    "Colocaste el =Explosivo=."
+  ],
+  "0302": [
+    "Abriste el cofre del tesoro."
+  ],
+  "0305": [
+    "¡Conseguiste una =Cápsula de Vida=!",
+    "¡Tu salud máxima aumentó en 5!"
+  ],
+  "0450": [
+    "¿Una moto, tal vez?"
+  ],
+  "0500": [
+    "Hola.",
+    "Mi nombre es Santa.",
+    "Estaba sacando algo de agua cuando de\nrepente me atacaron unos monstruos.",
+    "Me escapé y corrí a casa, pero en algún\nlugar del camino se me cayó la llave.",
+    "...Me quedé encerrado afuera de mi propia\ncasa."
+  ],
+  "0501": [
+    "Sin mi llave, estoy encerrado afuera...",
+    "¿Y ahora qué..."
+  ],
+  "0503": [
+    "¡Oh!",
+    "¡Esa es la llave de mi casa!",
+    "Le entregaste la =Llave de Santa=.",
+    "¡Gracias!",
+    "Pasa.",
+    "Tengo una buena recompensa para ti."
+  ],
+  "0600": [
+    "Entonces, joven,\n¿nos puedes guiar de vuelta?",
+    "Kazuma.",
+    "¿Sí, señor?",
+    "¿Puedes manejar eso?",
+    "Creo que sí.",
+    "¡¡No se DETIEEEENEEEEE!!"
+  ]
+}
