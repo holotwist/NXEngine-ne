@@ -50,6 +50,7 @@ bool Renderer::init(int resolution)
 
   SetConfigFlags(FLAG_WINDOW_RESIZABLE | FLAG_VSYNC_HINT);
   InitWindow(res[_currentRes].width, res[_currentRes].height, NXVERSION);
+  SetExitKey(KEY_NULL); // Disable Raylib default exit on ESC
   SetWindowMinSize(320, 240);
   SetTargetFPS(50); // Standard freq ticks
 
