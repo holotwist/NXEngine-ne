@@ -96,6 +96,10 @@ public:
   void stop(int32_t slot);
   void mixActiveChannels(int16_t *stream, uint32_t frameCount);
 
+  bool loadCsPlusSfx(const std::string &dir);
+  void restoreDefaultSfx();
+  const std::vector<int16_t> &getSound(int slot) const { return _sounds[slot]; }
+
 protected:
   friend class Singleton<Pixtone>;
 
@@ -109,6 +113,7 @@ private:
 
   bool _inited = false;
   std::vector<int16_t> _sounds[256];
+  std::vector<int16_t> _defaultSounds[256];
   PxtVoice _voices[MAX_PXT_VOICES];
   const uint32_t NUM_SOUNDS = 0x75;
 };

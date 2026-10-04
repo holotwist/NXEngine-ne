@@ -3,6 +3,6 @@
 
 #include <cstdio>
 
-bool extract_stages(FILE *exefp);
+bool extract_stages(FILE *exefp, const char *out_dir = "data/doukutsu_data");
 
 #endif

@@ -6,6 +6,7 @@ BUILD_DIR="build"
 DIST_DIR="dist"
 BUILD_TYPE="Release"
 RAYLIB_PATH=""
+DOUKUTSU_PATH=""
 PACKAGE=0
 PACKAGE_VER=""
 CLEAN=0
@@ -17,6 +18,8 @@ Usage: ./build.sh [OPTIONS] [-- <additional cmake flags>]
 
 Options:
   --raylib-path <path>    Specify local Raylib directory (lib/ and include/)
+  --doukutsu <path>       Path to Doukutsu directory or executable to extract assets
+  --csplus <path>         Path to Cave Story+ assets directory (containing base/)
   -p, --package [ver]     Build and create .tar.gz distribution package
   -c, --clean             Remove build directory before configuring
   -d, --debug             Configure build in Debug mode
@@ -25,6 +28,7 @@ Options:
 
 Examples:
   ./build.sh --raylib-path /usr/local
+  ./build.sh --doukutsu /path/to/Doukutsu
   ./build.sh -c -r
   ./build.sh -p v2.6.5
 EOF
@@ -34,6 +38,14 @@ while [[ $# -gt 0 ]]; do
     case "$1" in
         --raylib-path)
             RAYLIB_PATH="$2"
+            shift 2
+            ;;
+        --doukutsu|--doukutsu-path)
+            DOUKUTSU_PATH="$2"
+            shift 2
+            ;;
+        --csplus|--csplus-path)
+            CSPLUS_PATH="$2"
             shift 2
             ;;
         -p|--package)
@@ -94,6 +106,94 @@ fi
 
 echo "==> Configuring with: cmake ${CMAKE_CONFIG_ARGS[*]}"
 cmake "${CMAKE_CONFIG_ARGS[@]}"
+
+# Extract Doukutsu assets if path specified
+if [ -n "$DOUKUTSU_PATH" ]; then
+    echo "==> Building extractor tool..."
+    cmake --build "$BUILD_DIR" --target nxextract --parallel
+
+    DEST_DOUKUTSU="data/doukutsu_data"
+    EXE_FILE=""
+    SRC_DATA_DIR=""
+
+    if [ -f "$DOUKUTSU_PATH" ]; then
+        EXE_FILE="$DOUKUTSU_PATH"
+        PARENT_DIR="$(dirname "$DOUKUTSU_PATH")"
+        [ -d "${PARENT_DIR}/data" ] && SRC_DATA_DIR="${PARENT_DIR}/data"
+    elif [ -d "$DOUKUTSU_PATH" ]; then
+        for candidate in "$DOUKUTSU_PATH/Doukutsu.exe" "$DOUKUTSU_PATH/doukutsu.exe" "$DOUKUTSU_PATH/DOUKUTSU.EXE"; do
+            if [ -f "$candidate" ]; then
+                EXE_FILE="$candidate"
+                break
+            fi
+        done
+        [ -d "$DOUKUTSU_PATH/data" ] && SRC_DATA_DIR="$DOUKUTSU_PATH/data"
+    fi
+
+    if [ -z "$EXE_FILE" ] || [ ! -f "$EXE_FILE" ]; then
+        echo "Error: Doukutsu.exe not found at '$DOUKUTSU_PATH'" >&2
+        exit 1
+    fi
+
+    mkdir -p "$DEST_DOUKUTSU"
+
+    # Copy files data folder
+    if [ -n "$SRC_DATA_DIR" ] && [ -d "$SRC_DATA_DIR" ]; then
+        echo "==> Copying Doukutsu data files..."
+        cp -r "$SRC_DATA_DIR"/* "$DEST_DOUKUTSU"/
+    fi
+
+    # Extract assets from Doukutsu.exe
+    echo "==> Extracting executable assets from $EXE_FILE..."
+    "${BUILD_DIR}/nxextract" "$EXE_FILE" "$DEST_DOUKUTSU"
+fi
+
+# Copy CSPlus assets and soundtrack folders if path specified
+if [ -n "$CSPLUS_PATH" ]; then
+    echo "==> Setting up Cave Story+ assets..."
+    DEST_CSPLUS="data/csplus_data/base"
+    DEST_OSTS="data/osts"
+    mkdir -p "$DEST_CSPLUS"
+    mkdir -p "$DEST_OSTS"
+
+    SRC_BASE=""
+    if [ -d "$CSPLUS_PATH/base" ]; then
+        SRC_BASE="$CSPLUS_PATH/base"
+    elif [ -d "$CSPLUS_PATH/Base" ]; then
+        SRC_BASE="$CSPLUS_PATH/Base"
+    elif [ -d "$CSPLUS_PATH" ]; then
+        SRC_BASE="$CSPLUS_PATH"
+    fi
+
+    if [ -n "$SRC_BASE" ] && [ -d "$SRC_BASE" ]; then
+        echo "==> Storing CS+ data in $DEST_CSPLUS..."
+        cp -r "$SRC_BASE"/* "$DEST_CSPLUS"/
+
+        echo "==> Moving soundtrack tracks to $DEST_OSTS..."
+        for d in ogg ogg11 ogg17 ogg_ridic org pixtone Ogg Ogg11 Ogg17 Org PixTone; do
+            if [ -d "$SRC_BASE/$d" ]; then
+                target_d="$(echo "$d" | tr '[:upper:]' '[:lower:]')"
+                mkdir -p "$DEST_OSTS/$target_d"
+                cp -r "$SRC_BASE/$d"/* "$DEST_OSTS/$target_d/"
+            fi
+        done
+    else
+        echo "Warning: Could not find base directory in '$CSPLUS_PATH'" >&2
+    fi
+fi
+
+# Move already present data if csplus_data exists but data/osts does not
+if [ -d "data/csplus_data/base" ] && [ ! -d "data/osts" ]; then
+    echo "==> Changing existing soundtracks to data/osts..."
+    mkdir -p "data/osts"
+    for d in ogg ogg11 ogg17 ogg_ridic org pixtone Ogg Ogg11 Ogg17 Org PixTone; do
+        if [ -d "data/csplus_data/base/$d" ]; then
+            target_d="$(echo "$d" | tr '[:upper:]' '[:lower:]')"
+            mkdir -p "data/osts/$target_d"
+            cp -r "data/csplus_data/base/$d"/* "data/osts/$target_d/"
+        fi
+    done
+fi
 
 echo "==> Building project..."
 BUILD_CMD=(cmake --build "$BUILD_DIR" --parallel)

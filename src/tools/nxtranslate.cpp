@@ -350,8 +350,9 @@ int main(int argc, char *argv[]) {
             {"available", "available"}
         };
 
-        // Extract stage titles from data/stage.dat if present
+        // Extract stage titles from stage.dat if present
         fs::path stagedat = data_dir / "stage.dat";
+        if (!fs::exists(stagedat)) stagedat = data_dir / "doukutsu_data" / "stage.dat";
         if (fs::exists(stagedat)) {
             std::ifstream sf(stagedat, std::ios::binary);
             if (sf.is_open()) {

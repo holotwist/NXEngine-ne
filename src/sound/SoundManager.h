@@ -149,15 +149,26 @@ private:
   ma_device _device;
   bool _deviceInitialized = false;
 
+  struct SoundtrackInfo {
+    std::string id;
+    std::string name;
+    std::string dir;
+    bool is_organya;
+    bool is_csplus;
+  };
+
   uint32_t _lastSong    = 0;
   uint32_t _lastSongPos = 0;
   uint32_t _currentSong = 0;
 
   std::vector<std::string> _music_names;
-  std::vector<bool> _music_loop;
-  std::vector<std::string> _music_dirs;
   std::vector<std::string> _music_dir_names;
-  std::vector<std::string> _music_playlists;
+  std::vector<SoundtrackInfo> _soundtracks;
+  std::string _csPlusPixDir;
+
+  void _start_track(int songno, bool resume);
+  void _detectSoundtracks();
+  void _applySfxForSoundtrack(size_t stIndex);
 
   const char _bossmusic[14] = {4, 7, 10, 11, 15, 16, 17, 18, 21, 22, 31, 33, 35, 0};
 };
