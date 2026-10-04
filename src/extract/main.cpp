@@ -5,26 +5,26 @@
 #include <cstdio>
 #include <cstdlib>
 
-static const char *filename = "Doukutsu.exe";
-
 int main(int argc, char *argv[])
 {
-  FILE *fp;
+  const char *exename = "Doukutsu.exe";
+  const char *outdir  = "data/doukutsu_data";
 
-  fp = fopen(filename, "rb");
+  if (argc > 1) exename = argv[1];
+  if (argc > 2) outdir  = argv[2];
+
+  FILE *fp = fopen(exename, "rb");
   if (!fp)
   {
-    printf("Can't open Doukutsu.exe!\n");
+    printf("Can't open %s!\n", exename);
     return 1;
   }
 
-  if (extract_pxt(fp))
-    return 1;
-  if (extract_files(fp))
-    return 1;
-  if (extract_stages(fp))
-    return 1;
+  if (extract_pxt(fp, outdir)) return 1;
+  if (extract_files(fp, outdir)) return 1;
+  if (extract_stages(fp, outdir)) return 1;
+
   fclose(fp);
-  printf("Sucessfully extracted.\n");
+  printf("Successfully extracted to %s.\n", outdir);
   return 0;
 }

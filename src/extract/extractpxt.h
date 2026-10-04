@@ -3,6 +3,6 @@
 
 #include <cstdio>
 
-bool extract_pxt(FILE *fp);
+bool extract_pxt(FILE *fp, const char *out_dir = "data/doukutsu_data");
 
 #endif

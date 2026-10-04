@@ -273,7 +273,48 @@ bool Pixtone::init()
     snd.freeBuf();
   }
 
+  for (int i = 0; i < 256; i++)
+    _defaultSounds[i] = _sounds[i];
+
   return true;
+}
+
+bool Pixtone::loadCsPlusSfx(const std::string &dir)
+{
+  bool loadedAny = false;
+  for (uint32_t slot = 1; slot < 256; slot++)
+  {
+    std::string relPath = dir + "pix" + std::to_string(slot) + ".wav";
+    std::string fullPath = ResourceManager::getInstance()->getOstPath(relPath);
+
+    if (ResourceManager::fileExists(fullPath))
+    {
+      ma_decoder decoder;
+      std::memset(&decoder, 0, sizeof(decoder));
+      ma_decoder_config config = ma_decoder_config_init(ma_format_s16, 1, SAMPLE_RATE);
+      if (ma_decoder_init_file(fullPath.c_str(), &config, &decoder) == MA_SUCCESS)
+      {
+        ma_uint64 totalFrames = 0;
+        ma_decoder_get_length_in_pcm_frames(&decoder, &totalFrames);
+        if (totalFrames > 0)
+        {
+          _sounds[slot].resize((size_t)totalFrames);
+          ma_uint64 framesRead = 0;
+          ma_decoder_read_pcm_frames(&decoder, _sounds[slot].data(), totalFrames, &framesRead);
+          _sounds[slot].resize((size_t)framesRead);
+          loadedAny = true;
+        }
+        ma_decoder_uninit(&decoder);
+      }
+    }
+  }
+  return loadedAny;
+}
+
+void Pixtone::restoreDefaultSfx()
+{
+  for (int i = 0; i < 256; i++)
+    _sounds[i] = _defaultSounds[i];
 }
 
 void Pixtone::shutdown()

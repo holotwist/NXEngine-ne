@@ -1,5 +1,6 @@
 
 #include "extractstages.h"
+#include "extractfiles.h"
 
 #include "maprecord.h"
 #include "stagedata.h"
@@ -53,11 +54,13 @@ int find_index(const char *fname, const char *list[])
   return 0xff;
 }
 
-bool extract_stages(FILE *exefp)
+bool extract_stages(FILE *exefp, const char *out_dir)
 {
   int i;
 
-  printf("[ data/stage.dat ]\n");
+  char outfilename[1024];
+  snprintf(outfilename, sizeof(outfilename), "%s/stage.dat", out_dir);
+  printf("[ %s ]\n", outfilename);
 
   // load raw data into struct
   fseek(exefp, DATA_OFFSET, SEEK_SET);
@@ -113,10 +116,11 @@ bool extract_stages(FILE *exefp)
   }
 
   // write out
-  FILE *fpo = fopen("data/stage.dat", "wb");
+  createdir(outfilename);
+  FILE *fpo = fopen(outfilename, "wb");
   if (!fpo)
   {
-    printf("failed to open stage.dat for writing\n");
+    printf("failed to open %s for writing\n", outfilename);
     return 1;
   }
 

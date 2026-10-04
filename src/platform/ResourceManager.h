@@ -34,6 +34,7 @@ public:
 
   void shutdown();
   std::string getPath(const std::string &filename, bool localized = true);
+  std::string getOstPath(const std::string &filename);
 
   std::string getPrefPath(const std::string &filename);
 

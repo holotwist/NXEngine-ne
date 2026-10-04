@@ -1,16 +1,11 @@
 
 #include "extractpxt.h"
-
+#include "extractfiles.h"
 #include "misc.h"
 
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <sys/stat.h>
-
-#if defined(_WIN32)
-#include <direct.h>
-#endif
 
 static struct
 {
@@ -56,7 +51,7 @@ static struct
            {0x75, 2, 0x092f80}, {0x96, 2, 0x0922d0}, {0x97, 2, 0x0923b0}, {0x98, 1, 0x092490},
            {0x99, 1, 0x092500}, {0x9a, 2, 0x092570}, {0x9b, 2, 0x0929d0}, {0, 0, 0}};
 
-bool extract_pxt(FILE *fp)
+bool extract_pxt(FILE *fp, const char *out_dir)
 {
   struct
   {
@@ -73,14 +68,10 @@ bool extract_pxt(FILE *fp)
       break;
 
     char outfilename[1024];
-    sprintf(outfilename, "data/pxt/fx%02x.pxt", snd[s].id);
+    snprintf(outfilename, sizeof(outfilename), "%s/pxt/fx%02x.pxt", out_dir, snd[s].id);
     printf("[ %s ]\n", outfilename);
 
-#if defined(_WIN32) || defined(_WIN64)
-    _mkdir("data/pxt");
-#else
-    mkdir("data/pxt", 0755);
-#endif
+    createdir(outfilename);
 
     FILE *fpo = fopen(outfilename, "wb");
     if (!fpo)

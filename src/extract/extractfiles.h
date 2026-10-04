@@ -3,6 +3,7 @@
 
 #include <cstdio>
 
-bool extract_files(FILE *exefp);
+void createdir(const char *fname);
+bool extract_files(FILE *exefp, const char *out_dir = "data/doukutsu_data");
 
 #endif

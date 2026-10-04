@@ -1,6 +1,7 @@
 #include "SoundManager.h"
 #include "Pixtone.h"
 #include "Organya.h"
+#include "OggMusic.h"
 #include "ResourceManager.h"
 #include "core/common/misc.h"
 #include "Logger.h"
@@ -55,37 +56,11 @@ bool SoundManager::init()
   // Initialize synthesizers
   Pixtone::getInstance()->init();
   Organya::getInstance()->init();
-
-  // Load tracklists
-  std::string path = ResourceManager::getInstance()->getPath("music_dirs.json", false);
-  _music_dirs.clear();
-  _music_dir_names.clear();
-  _music_playlists.clear();
-  _music_dirs.push_back("org/");
-  _music_dir_names.push_back("Original");
-  _music_playlists.push_back("music.json");
-
-  std::ifstream fl(widen(path), std::ifstream::in | std::ifstream::binary);
-  if (fl.is_open())
-  {
-    nlohmann::json dirlist = nlohmann::json::parse(fl, nullptr, false);
-    if (!dirlist.is_discarded())
-    {
-      for (auto it = dirlist.begin(); it != dirlist.end(); ++it)
-      {
-        std::string dir = it.value().at("dir");
-        if (ResourceManager::getInstance()->fileExists(ResourceManager::getInstance()->getPathForDir(dir)))
-        {
-          auto it_playlist = it.value().find("playlist");
-          _music_playlists.push_back(it_playlist != it.value().end() ? it_playlist->get<std::string>() : "music.json");
-          _music_dirs.push_back(dir);
-          _music_dir_names.push_back(it.value().at("name"));
-        }
-      }
-    }
-  }
+  OggMusic::getInstance()->init();
 
   _reloadTrackList();
+  _detectSoundtracks();
+  _applySfxForSoundtrack(settings->new_music);
 
   if (ma_device_start(&_device) != MA_SUCCESS)
   {
@@ -104,6 +79,7 @@ void SoundManager::shutdown()
     ma_device_uninit(&_device);
     _deviceInitialized = false;
   }
+  OggMusic::getInstance()->shutdown();
   Organya::getInstance()->shutdown();
   Pixtone::getInstance()->shutdown();
 }
@@ -114,13 +90,18 @@ void SoundManager::audioCallback(void *pOutput, const void *pInput, ma_uint32 fr
   int16_t *out = static_cast<int16_t *>(pOutput);
   std::memset(out, 0, frameCount * AUDIO_CHANNELS * sizeof(int16_t));
 
-  // Synthesize and mix active Organya music
-  if (settings->music_enabled && Organya::getInstance()->isPlaying())
+  if (settings->music_enabled)
   {
-    Organya::getInstance()->renderAudio(out, frameCount);
+    if (OggMusic::getInstance()->isPlaying())
+    {
+      OggMusic::getInstance()->renderAudio(out, frameCount);
+    }
+    else if (Organya::getInstance()->isPlaying())
+    {
+      Organya::getInstance()->renderAudio(out, frameCount);
+    }
   }
 
-  // Mix active Pixtone sound effects
   if (settings->sound_enabled)
   {
     Pixtone::getInstance()->mixActiveChannels(out, frameCount);
@@ -162,6 +143,79 @@ void SoundManager::stopLoopSfx()
   stopSfx(SFX::SND_PROPELLOR);
 }
 
+static const char *s_song_names[] = {
+  "", "wanpaku", "anzen", "gameover", "gravity", "weed", "mdown2", "fireeye",
+  "vivi", "mura", "fanfale1", "ginsuke", "cemetery", "plant", "kodou",
+  "fanfale3", "fanfale2", "dr", "escape", "jenka", "maze", "access",
+  "ironh", "grand", "curly", "oside", "requiem", "wanpak2", "quiet",
+  "lastcave", "balcony", "lastbtl", "lastbt3", "ending", "zonbie", "bdown",
+  "hell", "jenka2", "marine", "ballos", "toroko", "white", "kaze", "ika"
+};
+
+static inline bool is_song_looping(int songno)
+{
+  return (songno != 3 && songno != 10 && songno != 15 && songno != 16);
+}
+
+void SoundManager::_detectSoundtracks()
+{
+  _soundtracks.clear();
+  _music_dir_names.clear();
+
+  // 1. Original Organya
+  _soundtracks.push_back({"organya", "Original", "org/", true, false});
+  _music_dir_names.push_back("Original");
+
+  struct Candidate {
+    const char *id;
+    const char *name;
+    const char *dir;
+    const char *testFile;
+  } candidates[] = {
+    {"remastered", "Remastered",  "ogg11/",     "access_intro.ogg"},
+    {"new",        "Cave Story+", "ogg/",       "access.ogg"},
+    {"famitracks", "Famitracks",  "ogg17/",     "access.ogg"},
+    {"ridiculon",  "Ridiculon",   "ogg_ridic/", "access.ogg"}
+  };
+
+  for (const auto &c : candidates)
+  {
+    std::string testPath = ResourceManager::getInstance()->getOstPath(std::string(c.dir) + c.testFile);
+    if (ResourceManager::fileExists(testPath))
+    {
+      _soundtracks.push_back({c.id, c.name, c.dir, false, true});
+      _music_dir_names.push_back(c.name);
+    }
+    else
+    {
+      std::string basePath = ResourceManager::getInstance()->getOstPath(std::string("base/") + c.dir + c.testFile);
+      if (ResourceManager::fileExists(basePath))
+      {
+        _soundtracks.push_back({c.id, c.name, std::string("base/") + c.dir, false, true});
+        _music_dir_names.push_back(c.name);
+      }
+    }
+  }
+
+  // Detect Pixtone WAV directory
+  _csPlusPixDir.clear();
+  if (ResourceManager::fileExists(ResourceManager::getInstance()->getOstPath("pixtone/pix1.wav")))
+    _csPlusPixDir = "pixtone/";
+  else if (ResourceManager::fileExists(ResourceManager::getInstance()->getOstPath("base/pixtone/pix1.wav")))
+    _csPlusPixDir = "base/pixtone/";
+
+  if (settings->new_music >= _soundtracks.size())
+    settings->new_music = 0;
+}
+
+void SoundManager::_applySfxForSoundtrack(size_t stIndex)
+{
+  if (stIndex < _soundtracks.size() && _soundtracks[stIndex].is_csplus && !_csPlusPixDir.empty())
+    Pixtone::getInstance()->loadCsPlusSfx(_csPlusPixDir);
+  else
+    Pixtone::getInstance()->restoreDefaultSfx();
+}
+
 void SoundManager::music(uint32_t songno, bool resume)
 {
   if (songno == _currentSong) return;
@@ -171,23 +225,75 @@ void SoundManager::music(uint32_t songno, bool resume)
   if (songno != 0 && !_shouldMusicPlay(songno, settings->music_enabled))
   {
     _lastSongPos = Organya::getInstance()->stop();
+    OggMusic::getInstance()->stop();
     return;
   }
 
-  _start_org_track(songno, resume);
+  _start_track(songno, resume);
 }
 
-void SoundManager::_start_org_track(int songno, bool resume)
+void SoundManager::_start_track(int songno, bool resume)
 {
-  if (_music_names.size() < 2) return;
-  _lastSongPos = Organya::getInstance()->stop();
-
-  if (songno == 0) return;
-
-  std::string songPath = ResourceManager::getInstance()->getPath(_music_dirs.at(0) + _music_names[songno] + ".org", false);
-  if (Organya::getInstance()->load(songPath))
+  if (songno <= 0 || songno >= (int)_music_names.size())
   {
-    Organya::getInstance()->start(resume ? _lastSongPos : 0);
+    _lastSongPos = Organya::getInstance()->stop();
+    OggMusic::getInstance()->stop();
+    return;
+  }
+
+  if (settings->new_music >= _soundtracks.size())
+    settings->new_music = 0;
+
+  const auto &st = _soundtracks.at(settings->new_music);
+  std::string songName = _music_names[songno];
+  if (songName.empty()) return;
+
+  if (st.is_organya)
+  {
+    OggMusic::getInstance()->stop();
+    _lastSongPos = Organya::getInstance()->stop();
+
+    std::string songPath = ResourceManager::getInstance()->getOstPath(st.dir + songName + ".org");
+    if (Organya::getInstance()->load(songPath))
+    {
+      Organya::getInstance()->start(resume ? _lastSongPos : 0);
+    }
+  }
+  else
+  {
+    Organya::getInstance()->stop();
+    OggMusic::getInstance()->stop();
+
+    bool loop = is_song_looping(songno);
+
+    std::string introPath = ResourceManager::getInstance()->getOstPath(st.dir + songName + "_intro.ogg");
+    std::string loopPath  = ResourceManager::getInstance()->getOstPath(st.dir + songName + "_loop.ogg");
+
+    if (ResourceManager::fileExists(introPath) && ResourceManager::fileExists(loopPath))
+    {
+      if (OggMusic::getInstance()->load(introPath, loopPath, loop))
+      {
+        OggMusic::getInstance()->play(resume);
+        return;
+      }
+    }
+
+    std::string singlePath = ResourceManager::getInstance()->getOstPath(st.dir + songName + ".ogg");
+    if (ResourceManager::fileExists(singlePath))
+    {
+      if (OggMusic::getInstance()->load(singlePath, loop))
+      {
+        OggMusic::getInstance()->play(resume);
+        return;
+      }
+    }
+
+    // Fallback to original Organya
+    std::string fallbackPath = ResourceManager::getInstance()->getOstPath("org/" + songName + ".org");
+    if (Organya::getInstance()->load(fallbackPath))
+    {
+      Organya::getInstance()->start(resume ? _lastSongPos : 0);
+    }
   }
 }
 
@@ -195,25 +301,55 @@ void SoundManager::enableMusic(int newstate)
 {
   settings->music_enabled = newstate;
   bool play = _shouldMusicPlay(_currentSong, newstate);
-  if (play != Organya::getInstance()->isPlaying())
+  bool isPlaying = Organya::getInstance()->isPlaying() || OggMusic::getInstance()->isPlaying();
+  if (play != isPlaying)
   {
-    if (play) _start_org_track(_currentSong, false);
-    else _lastSongPos = Organya::getInstance()->stop();
+    if (play) _start_track(_currentSong, false);
+    else
+    {
+      _lastSongPos = Organya::getInstance()->stop();
+      OggMusic::getInstance()->stop();
+    }
   }
 }
 
 void SoundManager::setNewmusic(int newstate)
 {
+  if (newstate < 0 || newstate >= (int)_soundtracks.size())
+    newstate = 0;
+
   settings->new_music = newstate;
   Organya::getInstance()->stop();
-  _reloadTrackList();
-  _start_org_track(_currentSong, false);
+  OggMusic::getInstance()->stop();
+
+  _applySfxForSoundtrack(newstate);
+  _start_track(_currentSong, false);
 }
 
-void SoundManager::fadeMusic() { Organya::getInstance()->fade(); }
-void SoundManager::runFade()  { Organya::getInstance()->runFade(); }
-void SoundManager::pause()    { Organya::getInstance()->pause(); }
-void SoundManager::resume()   { Organya::getInstance()->resume(); }
+void SoundManager::fadeMusic()
+{
+  Organya::getInstance()->fade();
+  OggMusic::getInstance()->fade();
+}
+
+void SoundManager::runFade()
+{
+  Organya::getInstance()->runFade();
+  OggMusic::getInstance()->runFade();
+}
+
+void SoundManager::pause()
+{
+  Organya::getInstance()->pause();
+  OggMusic::getInstance()->pause();
+}
+
+void SoundManager::resume()
+{
+  Organya::getInstance()->resume();
+  OggMusic::getInstance()->resume();
+}
+
 void SoundManager::updateMusicVolume() {}
 void SoundManager::updateSfxVolume() {}
 
@@ -236,28 +372,10 @@ bool SoundManager::_musicIsBoss(uint32_t songno)
 
 void SoundManager::_reloadTrackList()
 {
-  if (_music_playlists.size() <= settings->new_music)
-    settings->new_music = 0;
-
-  std::string path = ResourceManager::getInstance()->getPath(_music_playlists.at(settings->new_music), false);
   _music_names.clear();
-  _music_names.push_back("");
-  _music_loop.clear();
-  _music_loop.push_back(false);
-
-  std::ifstream fl(widen(path), std::ifstream::in | std::ifstream::binary);
-  if (fl.is_open())
+  for (size_t i = 0; i < sizeof(s_song_names) / sizeof(s_song_names[0]); i++)
   {
-    nlohmann::json tracklist = nlohmann::json::parse(fl, nullptr, false);
-    if (!tracklist.is_discarded())
-    {
-      for (auto it = tracklist.begin(); it != tracklist.end(); ++it)
-      {
-        auto it_loop = it.value().find("loop");
-        _music_loop.push_back(it_loop != it.value().end() ? it_loop->get<bool>() : true);
-        _music_names.push_back(it.value().at("name"));
-      }
-    }
+    _music_names.push_back(s_song_names[i]);
   }
 }
 

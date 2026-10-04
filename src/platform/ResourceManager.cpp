@@ -25,33 +25,19 @@
 
 bool ResourceManager::fileExists(const std::string &filename)
 {
+  std::string path = filename;
+  while (path.size() > 1 && (path.back() == '/' || path.back() == '\\'))
+    path.pop_back();
+
 #if defined(__unix__) || defined(__APPLE__) || defined(__HAIKU__) || defined(__VITA__) || defined(__SWITCH__)
   struct stat st;
-
-  if (stat(filename.c_str(), &st) == 0)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
-#elif defined(_WIN32) || defined(WIN32) // Windows
-  DWORD attrs = GetFileAttributes(widen(filename).c_str());
-
-  // Assume path exists
-  if (attrs != INVALID_FILE_ATTRIBUTES)
-  {
-    return true;
-  }
-  else
-  {
-    return false;
-  }
+  return (stat(path.c_str(), &st) == 0);
+#elif defined(_WIN32) || defined(WIN32)
+  DWORD attrs = GetFileAttributes(widen(path).c_str());
+  return (attrs != INVALID_FILE_ATTRIBUTES);
 #else
 #error Platform not supported
 #endif
-  return false;
 }
 
 #include <raylib.h>
@@ -121,6 +107,7 @@ std::string ResourceManager::getPath(const std::string &filename, bool localized
     }
     if (localized) _paths.push_back(userResBase + "data/lang/" + std::string(settings->language) + "/" + filename);
     _paths.push_back(userResBase + "data/" + filename);
+    _paths.push_back(userResBase + "data/doukutsu_data/" + filename);
   }
 
   #if defined(DATADIR)
@@ -148,6 +135,7 @@ std::string ResourceManager::getPath(const std::string &filename, bool localized
   }
   _paths.push_back(_base + "resources/" + filename);
   _paths.push_back(_data + filename);
+  _paths.push_back(_data + "doukutsu_data/" + filename);
 
   for (auto &_tryPath: _paths)
   {
@@ -165,7 +153,10 @@ std::string ResourceManager::getPrefPath(const std::string &filename)
 
 std::string ResourceManager::getPathForDir(const std::string &dir)
 {
-  return getPath(dir, false);
+  std::string res = getPath(dir, false);
+  if (!res.empty() && res.back() != '/' && res.back() != '\\')
+    res += '/';
+  return res;
 }
 
 inline std::vector<std::string> glob(const std::string &pat)
@@ -287,4 +278,48 @@ bool ResourceManager::isMod()
 std::map<std::string, Mod> &ResourceManager::mods()
 {
   return _mods;
+}
+
+std::string ResourceManager::getOstPath(const std::string &filename)
+{
+  std::vector<std::string> _paths;
+  std::string userResBase = getUserPrefPath();
+
+  if (!userResBase.empty())
+  {
+    _paths.push_back(userResBase + "data/osts/" + filename);
+    _paths.push_back(userResBase + "data/csplus_data/base/" + filename);
+    _paths.push_back(userResBase + "data/csplus_data/" + filename);
+    _paths.push_back(userResBase + "data/base/" + filename);
+    _paths.push_back(userResBase + "data/" + filename);
+    _paths.push_back(userResBase + "data/doukutsu_data/" + filename);
+  }
+
+  #if defined(DATADIR)
+    std::string _data(DATADIR);
+  #else
+    std::string _data = getBasePath();
+    #if defined(HAVE_UNIX_LIKE) and !defined(PORTABLE)
+      _data += "../share/nxengine/data/";
+    #else
+      _data += "data/";
+    #endif
+  #endif
+
+  std::string _base = getBasePath();
+  _paths.push_back(_base + "resources/osts/" + filename);
+  _paths.push_back(_data + "osts/" + filename);
+  _paths.push_back(_data + "csplus_data/base/" + filename);
+  _paths.push_back(_data + "csplus_data/" + filename);
+  _paths.push_back(_data + "base/" + filename);
+  _paths.push_back(_data + filename);
+  _paths.push_back(_data + "doukutsu_data/" + filename);
+
+  for (auto &_tryPath : _paths)
+  {
+    if (fileExists(_tryPath))
+      return _tryPath;
+  }
+
+  return _paths.back();
 }
